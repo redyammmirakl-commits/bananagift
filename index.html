@@ -19,7 +19,6 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px; background-color: var(--card-bg); border-bottom: 1px solid #333;
         }
-        /* Один баланс */
         .balance { background: #333; padding: 8px 15px; border-radius: 20px; font-weight: bold; display: flex; gap: 5px; font-size: 16px; align-items: center;}
         .top-up-btn { background-color: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 12px;}
         
@@ -34,7 +33,6 @@
         .case-header { display: flex; align-items: center; gap: 15px; }
         .case-icon { font-size: 40px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; }
         .btn-action { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;}
-        .btn-action.disabled { background: #555; cursor: not-allowed; }
         
         #roulette-container {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -74,23 +72,17 @@
 <body>
 
     <div class="header">
-        <!-- Тут теперь только один баланс -->
         <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
         <button class="top-up-btn" onclick="tg.showAlert('Скоро!')">Пополнить</button>
     </div>
 
     <div id="screen-games" class="screen active">
         <h2 style="margin-top:0;">Кейсы</h2>
+        <!-- Оставили только один блок "Бесплатно" -->
         <div class="case-card" onclick="showFreeCases()">
             <div class="case-header">
                 <div class="case-icon">🎁</div>
                 <div><h3 style="margin:0 0 5px 0;">Бесплатно</h3><p style="margin:0; font-size:12px; color:#ccc;">2 кейса доступно</p></div>
-            </div>
-        </div>
-        <div class="case-card premium" onclick="tg.showAlert('Скоро!')">
-            <div class="case-header">
-                <div class="case-icon">💎</div>
-                <div><h3 style="margin:0 0 5px 0;">Premium</h3><p style="margin:0; font-size:12px; color:#ccc;">Лучшие призы</p></div>
             </div>
         </div>
     </div>
@@ -189,9 +181,13 @@
         let hasNft = false; 
         let wonNftData = null; 
         
-        // Единый баланс
-        let currentBalance = 0; 
+        let donateBalance = 0; 
+        let bonusBalance = 0;   
         let starsClaimed = false; 
+
+        function updateUI() {
+            document.getElementById('user-balance').innerText = donateBalance + bonusBalance;
+        }
 
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -233,12 +229,26 @@
                 title: 'Подписка',
                 message: 'Чтобы открыть кейс, подпишись на канал @bananagiftcaser',
                 buttons: [
-                    {id: 'go', type: 'default', text: 'Я подписался'},
+                    {id: 'open', type: 'default', text: 'Перейти в канал'},
                     {id: 'cancel', type: 'cancel', text: 'Отмена'}
                 ]
             }, function(result) {
-                if (result === 'go') {
-                    startRoulette('stars');
+                if (result === 'open') {
+                    tg.openTelegramLink('https://t.me/bananagiftcaser');
+                    setTimeout(() => {
+                        tg.showPopup({
+                            title: 'Проверка',
+                            message: 'Ты подписался на канал?',
+                            buttons: [
+                                {id: 'yes', type: 'default', text: 'Да, подписался'},
+                                {id: 'no', type: 'cancel', text: 'Нет'}
+                            ]
+                        }, function(res) {
+                            if (res === 'yes') {
+                                startRoulette('stars');
+                            }
+                        });
+                    }, 3000);
                 }
             });
         }
@@ -277,7 +287,7 @@
             if (type === 'stars') {
                 const rand = Math.random() * 100;
                 if (rand < 99) {
-                    const starAmount = Math.floor(Math.random() * 6) + 5; // 5-10 звезд
+                    const starAmount = Math.floor(Math.random() * 6) + 5;
                     winItem = { name: `+${starAmount} Stars`, isNft: false, amount: starAmount };
                 } else {
                     const randomPrize = starsCasePrizes[Math.floor(Math.random() * starsCasePrizes.length)];
@@ -331,9 +341,8 @@
                     if (type === 'stars') {
                         starsClaimed = true;
                         if (!isWinNft) {
-                            // Начисляем на единый баланс
-                            currentBalance += winItem.amount;
-                            document.getElementById('user-balance').innerText = currentBalance;
+                            bonusBalance += winItem.amount;
+                            updateUI();
                         } else {
                             hasNft = true;
                             wonNftData = winItem;
@@ -420,6 +429,8 @@
         function closeWinModal() {
             document.getElementById('win-modal').style.display = 'none';
         }
+
+        updateUI();
     </script>
 </body>
 </html>
