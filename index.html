@@ -22,39 +22,70 @@
         .balance { background: #333; padding: 8px 15px; border-radius: 20px; font-weight: bold; display: flex; gap: 5px; font-size: 16px; align-items: center;}
         .top-up-btn { background-color: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 12px;}
         
-        .screen { display: none; flex: 1; flex-direction: column; padding: 15px; overflow-y: auto; }
+        .screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
 
+        /* Экран списка кейсов */
+        .case-list { padding: 15px; }
         .case-card {
             background: linear-gradient(135deg, #2b1055, #7597de); border-radius: 16px;
-            padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px;
+            padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; cursor: pointer;
         }
         .case-card.premium { background: linear-gradient(135deg, #4a1c72, #d946ef); }
         .case-header { display: flex; align-items: center; gap: 15px; }
         .case-icon { font-size: 40px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; }
-        .btn-action { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;}
+        .btn-action { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; text-align: center;}
         
-        .btn-action.timer-btn { background: #333; cursor: not-allowed; color: var(--text-muted); }
+        /* ЭКРАН ВНУТРИ КЕЙСА (Как в Gorilla) */
+        #screen-inside-case {
+            background: radial-gradient(circle at center, #2b1055 0%, #121212 100%);
+            position: relative;
+            display: none; flex-direction: column; justify-content: space-between;
+        }
+        #screen-inside-case.active { display: flex; }
+        
+        .top-nav-case { display: flex; justify-content: space-between; padding: 15px; }
+        .icon-btn { background: rgba(255,255,255,0.1); border: none; color: white; padding: 10px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer;}
+        
+        .case-center-display { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+        .big-case-icon { font-size: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(138,43,226,0.5)); }
+        .case-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .case-desc { color: #aaa; font-size: 14px; margin-bottom: 20px; }
+        
+        .bottom-action { padding: 20px; }
+        .btn-roll-big { 
+            background: linear-gradient(90deg, #d946ef, #8a2be2); color: white; border: none; 
+            padding: 18px; border-radius: 15px; font-weight: bold; font-size: 18px; width: 100%; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(138,43,226,0.5);
+        }
+        .btn-roll-big:active { transform: scale(0.98); }
 
-        /* Блок содержимого кейса */
-        .case-content { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px; }
-        .case-content-title { font-size: 11px; color: #ccc; margin-bottom: 8px; text-align: center; text-transform: uppercase; letter-spacing: 1px;}
-        .case-items-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .case-items-grid::-webkit-scrollbar { display: none; }
-        .case-item-preview { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
-        .case-item-preview img { width: 40px; height: 40px; object-fit: contain; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px;}
-        .case-item-price { font-size: 10px; color: var(--gold); margin-top: 4px; font-weight: bold;}
+        /* Окно "Призы" */
+        #prizes-modal {
+            display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
+            background: var(--card-bg); border-radius: 20px 20px 0 0; z-index: 150;
+            flex-direction: column; padding: 20px; box-sizing: border-box;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .prizes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .prizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; }
+        .prize-item { background: #2a2a2a; padding: 10px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .prize-item img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; }
+        .prize-price { color: var(--gold); font-size: 12px; font-weight: bold; }
 
+        /* Рулетка */
         #roulette-container {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.95); z-index: 100; flex-direction: column; justify-content: center; align-items: center;
         }
-        .roulette-window { width: 100%; height: 100px; overflow: hidden; position: relative; border-top: 2px solid #333; border-bottom: 2px solid #333; background: #1a1a1a; }
-        .roulette-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: red; z-index: 10; transform: translateX(-50%); }
-        .roulette-track { display: flex; position: absolute; left: 0; top: 0; height: 100%; align-items: center; transition: transform 4s cubic-bezier(0.1, 0.7, 0.1, 1); }
-        .roulette-item { width: 80px; height: 80px; margin: 0 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .roulette-window { width: 100%; height: 120px; overflow: hidden; position: relative; border-top: 2px solid #333; border-bottom: 2px solid #333; background: #1a1a1a; }
+        .roulette-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: #d946ef; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px #d946ef; }
+        .roulette-track { display: flex; position: absolute; left: 0; top: 0; height: 100%; align-items: center; transition: transform 6s cubic-bezier(0.1, 0.7, 0.1, 1); }
+        .roulette-item { width: 90px; height: 90px; margin: 0 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
         .roulette-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
+        /* Окно выигрыша */
         #win-modal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
@@ -62,12 +93,11 @@
         .win-box { background: var(--card-bg); padding: 20px; border-radius: 20px; text-align: center; width: 100%; max-width: 300px; }
         .win-image { width: 120px; height: 120px; object-fit: contain; margin: 10px 0; }
         
-        .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px;}
         .inv-item { background: var(--card-bg); padding: 10px; border-radius: 12px; text-align: center; position: relative; }
         .inv-item img { width: 80px; height: 80px; object-fit: contain; }
         .inv-item .lock { position: absolute; top: 5px; right: 5px; font-size: 16px; }
-        .inv-progress { font-size: 10px; color: var(--text-muted); margin-top: 5px; }
-
+        
         .nav-bar {
             display: flex; justify-content: space-around; background-color: var(--card-bg);
             padding: 10px 0; border-top: 1px solid #333;
@@ -75,7 +105,7 @@
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
         .nav-item i { font-size: 20px; margin-bottom: 3px; font-style: normal; }
-        
+
         .progress-bar { background: #333; border-radius: 10px; height: 10px; width: 100%; margin: 5px 0; overflow: hidden; }
         .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 0.3s; }
     </style>
@@ -87,57 +117,41 @@
         <button class="top-up-btn" onclick="tg.showAlert('Скоро!')">Пополнить</button>
     </div>
 
+    <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="screen-games" class="screen active">
-        <h2 style="margin-top:0;">Кейсы</h2>
-        <div class="case-card" onclick="showFreeCases()">
-            <div class="case-header">
-                <div class="case-icon">🎁</div>
-                <div><h3 style="margin:0 0 5px 0;">Бесплатно</h3><p style="margin:0; font-size:12px; color:#ccc;">2 кейса доступно</p></div>
+        <div class="case-list">
+            <h2 style="margin-top:0;">Кейсы</h2>
+            <div class="case-card" onclick="openCaseMenu('nft')">
+                <div class="case-header">
+                    <div class="case-icon">🎁</div>
+                    <div><h3 style="margin:0 0 5px 0;">Бесплатный NFT</h3><p style="margin:0; font-size:12px; color:#ccc;">Нажми, чтобы открыть</p></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="screen-free" class="screen">
-        <h2 style="margin-top:0;">Бесплатные кейсы</h2>
+    <!-- ЭКРАН ВНУТРИ КЕЙСА -->
+    <div id="screen-inside-case" class="screen">
+        <div class="top-nav-case">
+            <button class="icon-btn" onclick="switchScreen('games')">← Назад</button>
+            <button class="icon-btn" onclick="openPrizes()">🎁 Призы</button>
+        </div>
         
-        <!-- Кейс со Звездами -->
-        <div class="case-card" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
-            <div class="case-header">
-                <div class="case-icon">⭐</div>
-                <div>
-                    <h3 style="margin:0 0 5px 0;">Stars</h3>
-                    <p style="margin:0; font-size:12px; color:#ccc;">За подписку (раз в 24 часа)</p>
-                </div>
-            </div>
-            <button class="btn-action" id="btn-stars-case" onclick="checkSubscription()">Подписаться и крутить</button>
+        <div class="case-center-display">
+            <div class="big-case-icon">🎁</div>
+            <div class="case-name">Бесплатный NFT</div>
+            <div class="case-desc">Внутри 7 крутых подарков</div>
         </div>
 
-        <!-- Кейс с NFT -->
-        <div class="case-card premium">
-            <div class="case-header">
-                <div class="case-icon">🎁</div>
-                <div>
-                    <h3 style="margin:0 0 5px 0;">Бесплатный NFT</h3>
-                    <p style="margin:0; font-size:12px; color:#ccc;">1 раз (5 друзей для вывода)</p>
-                </div>
-            </div>
-            <button class="btn-action" id="btn-nft-case" onclick="handleNftCaseClick()">Крутить</button>
-            
-            <!-- Блок содержимого кейса -->
-            <div class="case-content">
-                <div class="case-content-title">Содержимое кейса (шанс)</div>
-                <div class="case-items-grid" id="nft-preview-container">
-                    <!-- Сюда JS автоматически вставит картинки и цены -->
-                </div>
-            </div>
+        <div class="bottom-action">
+            <button class="btn-roll-big" id="btn-roll-inside" onclick="handleRollClick()">Крутить</button>
         </div>
-
-        <button class="btn-action" onclick="switchScreen('games')" style="background:#333; margin-top:10px;">Назад</button>
     </div>
 
+    <!-- ЭКРАН ПРОФИЛЯ -->
     <div id="screen-profile" class="screen">
-        <h2 style="margin-top:0;">Профиль</h2>
-        <div style="background:var(--card-bg); padding:15px; border-radius:15px; display:flex; align-items:center; gap:15px; margin-bottom: 20px;">
+        <h2 style="margin-top:15px; padding: 0 15px;">Профиль</h2>
+        <div style="background:var(--card-bg); margin: 0 15px; padding:15px; border-radius:15px; display:flex; align-items:center; gap:15px;">
             <div style="width:50px; height:50px; background:#333; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:24px;">👤</div>
             <div>
                 <p style="margin:0; font-size:16px; font-weight:bold;" id="profile-name">Гость</p>
@@ -145,20 +159,33 @@
             </div>
         </div>
         
-        <h3 style="margin-top:0;">Инвентарь</h3>
+        <h3 style="margin-top:20px; padding: 0 15px;">Инвентарь</h3>
         <div id="inventory-container" class="inventory-grid">
             <p style="color:var(--text-muted); font-size:14px; grid-column: span 2; text-align:center;" id="empty-inv-text">Инвентарь пуст</p>
         </div>
     </div>
 
+    <!-- ОКНО ПРИЗОВ -->
+    <div id="prizes-modal">
+        <div class="prizes-header">
+            <h3 style="margin:0;">Содержимое кейса</h3>
+            <button style="background:none; border:none; color:white; font-size:20px;" onclick="closePrizes()">✕</button>
+        </div>
+        <div class="prizes-grid" id="prizes-grid-container">
+            <!-- Заполняется через JS -->
+        </div>
+    </div>
+
+    <!-- РУЛЕТКА -->
     <div id="roulette-container">
-        <h2 id="roulette-title">Крутим...</h2>
+        <h2 id="roulette-title" style="margin-bottom: 30px;">Крутим...</h2>
         <div class="roulette-window">
             <div class="roulette-line"></div>
             <div class="roulette-track" id="roulette-track"></div>
         </div>
     </div>
 
+    <!-- ОКНО ВЫИГРЫША -->
     <div id="win-modal">
         <div class="win-box">
             <h2 id="win-title" style="color:var(--gold);">Ты выиграл!</h2>
@@ -175,7 +202,7 @@
             </div>
 
             <p id="win-desc" style="font-size:12px; color:#ccc; margin-top:10px;"></p>
-            <button class="btn-action" id="win-btn" onclick="closeWinModal()">Закрыть</button>
+            <button class="btn-action" id="win-btn" onclick="closeWinModal()" style="margin-top:15px;">Закрыть</button>
         </div>
     </div>
 
@@ -203,12 +230,8 @@
         
         let donateBalance = 0; 
         let bonusBalance = 0;   
-        
-        let starsClaimed = false; 
-        let timerInterval = null;
-        let timeLeft = 24 * 60 * 60; 
 
-        // ТУТ ТЕПЕРЬ ВСЕ 7 КАРТИНОК И ПРИМЕРНЫЕ ЦЕНЫ В STARS
+        // База призов (все 7 картинок + цены)
         const nftPrizes = [
             { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
             { id: 'cake', name: 'Homemade Cake', img: 'cake.png', chance: 0.4, price: 2500 }, 
@@ -219,49 +242,8 @@
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 100 }
         ];
 
-        // Автоматически заполняем блок "Содержимое кейса"
-        function renderCaseContent() {
-            const container = document.getElementById('nft-preview-container');
-            // Сортируем, чтобы самые дорогие были первыми
-            const sortedPrizes = [...nftPrizes].sort((a, b) => b.price - a.price);
-            
-            sortedPrizes.forEach(prize => {
-                const div = document.createElement('div');
-                div.className = 'case-item-preview';
-                div.innerHTML = `
-                    <img src="${prize.img}">
-                    <div class="case-item-price">${prize.price} ⭐</div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
         function updateUI() {
             document.getElementById('user-balance').innerText = donateBalance + bonusBalance;
-        }
-
-        function startTimer() {
-            starsClaimed = true;
-            timeLeft = 24 * 60 * 60; 
-            updateCaseButtons(); 
-            if (timerInterval) clearInterval(timerInterval);
-            
-            timerInterval = setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    let h = Math.floor(timeLeft / 3600);
-                    let m = Math.floor((timeLeft % 3600) / 60);
-                    let s = timeLeft % 60;
-                    let hStr = h < 10 ? "0" + h : h;
-                    let mStr = m < 10 ? "0" + m : m;
-                    let sStr = s < 10 ? "0" + s : s;
-                    document.getElementById('btn-stars-case').innerText = `⏳ ${hStr}:${mStr}:${sStr}`;
-                } else {
-                    clearInterval(timerInterval);
-                    starsClaimed = false;
-                    updateCaseButtons(); 
-                }
-            }, 1000); 
         }
 
         function switchScreen(screenId) {
@@ -269,159 +251,112 @@
             document.getElementById('screen-' + screenId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            if(screenId === 'games' || screenId === 'free') document.querySelectorAll('.nav-item')[0].classList.add('active');
+            if(screenId === 'games' || screenId === 'inside-case') document.querySelectorAll('.nav-item')[0].classList.add('active');
             if(screenId === 'profile') document.querySelectorAll('.nav-item')[4].classList.add('active');
         }
-        function showFreeCases() { switchScreen('free'); updateCaseButtons(); }
 
-        function updateCaseButtons() {
-            const btnNft = document.getElementById('btn-nft-case');
+        // Открытие меню кейса
+        function openCaseMenu(type) {
+            switchScreen('inside-case');
+            updateCaseButton();
+        }
+
+        // Обновление кнопки внутри кейса
+        function updateCaseButton() {
+            const btn = document.getElementById('btn-roll-inside');
             if (hasNft) {
-                btnNft.innerText = "Мои условия (0/5)";
-                btnNft.style.background = "#444";
+                btn.innerText = "Мои условия (0/5)";
+                btn.style.background = "#444";
+                btn.style.boxShadow = "none";
             } else {
-                btnNft.innerText = "Крутить";
-                btnNft.style.background = "var(--accent)";
-            }
-
-            const btnStars = document.getElementById('btn-stars-case');
-            if (starsClaimed) {
-                btnStars.classList.add('timer-btn'); 
-            } else {
-                btnStars.classList.remove('timer-btn'); 
-                btnStars.innerText = "Подписаться и крутить";
-                btnStars.style.background = "var(--accent)";
+                btn.innerText = "Крутить";
+                btn.style.background = "linear-gradient(90deg, #d946ef, #8a2be2)";
+                btn.style.boxShadow = "0 4px 15px rgba(138,43,226,0.5)";
             }
         }
 
-        function checkSubscription() {
-            if (starsClaimed) {
-                tg.showAlert("Ты уже крутил этот кейс. Возвращайся, когда таймер закончится!");
-                return;
+        // Клик по большой кнопке
+        function handleRollClick() {
+            if (hasNft) {
+                showNftConditions();
+            } else {
+                startRoulette();
             }
+        }
+
+        // Окно призов
+        function openPrizes() {
+            const container = document.getElementById('prizes-grid-container');
+            container.innerHTML = '';
+            const sortedPrizes = [...nftPrizes].sort((a, b) => b.price - a.price);
             
-            tg.showPopup({
-                title: 'Подписка',
-                message: 'Чтобы открыть кейс, подпишись на канал @bananagiftcaser',
-                buttons: [
-                    {id: 'open', type: 'default', text: 'Перейти в канал'},
-                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
-                ]
-            }, function(result) {
-                if (result === 'open') {
-                    tg.openTelegramLink('https://t.me/bananagiftcaser');
-                    setTimeout(() => {
-                        tg.showPopup({
-                            title: 'Проверка',
-                            message: 'Ты подписался на канал?',
-                            buttons: [
-                                {id: 'yes', type: 'default', text: 'Да, подписался'},
-                                {id: 'no', type: 'cancel', text: 'Нет'}
-                            ]
-                        }, function(res) {
-                            if (res === 'yes') {
-                                startRoulette('stars');
-                            }
-                        });
-                    }, 3000);
-                }
+            sortedPrizes.forEach(prize => {
+                const div = document.createElement('div');
+                div.className = 'prize-item';
+                div.innerHTML = `
+                    <img src="${prize.img}">
+                    <div style="font-size:12px; margin-bottom:3px;">${prize.name}</div>
+                    <div class="prize-price">${prize.price} ⭐</div>
+                `;
+                container.appendChild(div);
             });
+            document.getElementById('prizes-modal').style.display = 'flex';
         }
 
-        function handleNftCaseClick() {
-            if (hasNft) { showNftConditions(); } else { startRoulette('nft'); }
+        function closePrizes() {
+            document.getElementById('prizes-modal').style.display = 'none';
         }
 
-        const starsCasePrizes = nftPrizes.filter(p => p.id !== 'cat');
-
-        function startRoulette(type) {
+        // --- ЛОГИКА РУЛЕТКИ ---
+        function startRoulette() {
             const container = document.getElementById('roulette-container');
             const track = document.getElementById('roulette-track');
-            const title = document.getElementById('roulette-title');
             
             container.style.display = 'flex';
             track.style.transition = 'none';
             track.style.transform = 'translateX(0)';
             track.innerHTML = '';
-            
-            title.innerText = type === 'stars' ? 'Крутим Stars...' : 'Крутим NFT...';
 
-            let winItem;
-            let isWinNft = false;
-
-            if (type === 'stars') {
-                const rand = Math.random() * 100;
-                if (rand < 99) {
-                    const starAmount = Math.floor(Math.random() * 6) + 5;
-                    winItem = { name: `+${starAmount} Stars`, isNft: false, amount: starAmount };
-                } else {
-                    const randomPrize = starsCasePrizes[Math.floor(Math.random() * starsCasePrizes.length)];
-                    winItem = randomPrize;
-                    isWinNft = true;
-                    winItem.isNft = true;
-                }
-            } else {
-                const rand = Math.random() * 100;
-                let cumulative = 0;
-                for (let p of nftPrizes) {
-                    cumulative += p.chance;
-                    if (rand <= cumulative) { winItem = p; break; }
-                }
-                if (!winItem) winItem = nftPrizes[nftPrizes.length - 1];
-                isWinNft = true;
-                winItem.isNft = true;
+            // Выбираем приз по шансам
+            const rand = Math.random() * 100;
+            let cumulative = 0;
+            let winItem = nftPrizes[nftPrizes.length - 1];
+            for (let p of nftPrizes) {
+                cumulative += p.chance;
+                if (rand <= cumulative) { winItem = p; break; }
             }
+            winItem.isNft = true;
 
+            // Заполняем ленту
             const items = [];
-            for (let i = 0; i < 50; i++) {
-                if (type === 'stars') {
-                    items.push({ img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png' });
-                } else {
-                    items.push(nftPrizes[Math.floor(Math.random() * nftPrizes.length)]);
-                }
+            for (let i = 0; i < 60; i++) {
+                items.push(nftPrizes[Math.floor(Math.random() * nftPrizes.length)]);
             }
 
-            const winIndex = 45;
-            if (type === 'stars' && !isWinNft) {
-                items[winIndex] = { img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png' };
-            } else {
-                items[winIndex] = winItem;
-            }
+            const winIndex = 55;
+            items[winIndex] = winItem;
 
             items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'roulette-item';
-                div.innerHTML = `<img src="${item.img || 'https://em-content.zobj.net/source/apple/354/star_2b50.png'}">`;
+                div.innerHTML = `<img src="${item.img}">`;
                 track.appendChild(div);
             });
 
+            // Запускаем анимацию (6 секунд)
             setTimeout(() => {
-                track.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
-                const offset = (winIndex * 100) - (window.innerWidth / 2) + 40; 
+                track.style.transition = 'transform 6s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                const offset = (winIndex * 110) - (window.innerWidth / 2) + 45; // 110 = ширина + отступы
                 track.style.transform = `translateX(-${offset}px)`;
 
                 setTimeout(() => {
                     container.style.display = 'none';
-                    
-                    if (type === 'stars') {
-                        startTimer(); 
-                        if (!isWinNft) {
-                            bonusBalance += winItem.amount;
-                            updateUI();
-                        } else {
-                            hasNft = true;
-                            wonNftData = winItem;
-                            addToInventory(winItem);
-                        }
-                    } else if (type === 'nft') {
-                        hasNft = true;
-                        wonNftData = winItem;
-                        addToInventory(winItem);
-                        updateCaseButtons();
-                    }
-                    
+                    hasNft = true;
+                    wonNftData = winItem;
+                    addToInventory(winItem);
+                    updateCaseButton();
                     showWinModal(winItem);
-                }, 4100);
+                }, 6100); // Ждем чуть больше 6 секунд
             }, 100);
         }
 
@@ -439,10 +374,8 @@
                 ${!isUnlocked ? '<div class="lock">🔒</div>' : ''}
                 <p style="margin:5px 0 0 0; font-size:12px;">${item.name}</p>
                 ${!isUnlocked ? `
-                <div class="inv-progress">
-                    <div class="progress-bar"><div class="progress-fill" style="width: ${percent}%;"></div></div>
-                    <span>${myReferrals}/${neededReferrals}</span>
-                </div>` : '<p style="color:var(--green); font-size:10px; margin:0;">Разблокировано</p>'}
+                <div class="progress-bar" style="height: 5px; margin-top:5px;"><div class="progress-fill" style="width: ${percent}%;"></div></div>
+                ` : '<p style="color:var(--green); font-size:10px; margin:0;">Разблокировано</p>'}
             `;
             invContainer.appendChild(invItem);
         }
@@ -471,23 +404,15 @@
 
             modal.style.display = 'flex';
             
-            if (item.isNft) {
-                img.src = item.img;
-                img.style.display = 'block';
-                title.innerText = 'Ты выиграл NFT!';
-                name.innerText = item.name;
-                desc.innerText = 'Он добавлен в твой инвентарь.';
-                refBlock.style.display = 'block';
-                
-                document.getElementById('win-ref-count').innerText = myReferrals;
-                document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
-            } else {
-                img.style.display = 'none';
-                title.innerText = 'Ты выиграл!';
-                name.innerText = item.name;
-                desc.innerText = 'Зачислено на твой баланс.';
-                refBlock.style.display = 'none';
-            }
+            img.src = item.img;
+            img.style.display = 'block';
+            title.innerText = 'Ты выиграл NFT!';
+            name.innerText = item.name;
+            desc.innerText = 'Он добавлен в твой инвентарь.';
+            refBlock.style.display = 'block';
+            
+            document.getElementById('win-ref-count').innerText = myReferrals;
+            document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
         }
 
         function closeWinModal() {
@@ -495,7 +420,6 @@
         }
 
         updateUI();
-        renderCaseContent(); // Запускаем отрисовку содержимого кейса при загрузке
     </script>
 </body>
 </html>
