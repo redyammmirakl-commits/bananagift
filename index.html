@@ -34,6 +34,17 @@
         .case-icon { font-size: 40px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; }
         .btn-action { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 14px;}
         
+        .btn-action.timer-btn { background: #333; cursor: not-allowed; color: var(--text-muted); }
+
+        /* Блок содержимого кейса */
+        .case-content { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px; }
+        .case-content-title { font-size: 11px; color: #ccc; margin-bottom: 8px; text-align: center; text-transform: uppercase; letter-spacing: 1px;}
+        .case-items-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .case-items-grid::-webkit-scrollbar { display: none; }
+        .case-item-preview { display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+        .case-item-preview img { width: 40px; height: 40px; object-fit: contain; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px;}
+        .case-item-price { font-size: 10px; color: var(--gold); margin-top: 4px; font-weight: bold;}
+
         #roulette-container {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center;
@@ -78,7 +89,6 @@
 
     <div id="screen-games" class="screen active">
         <h2 style="margin-top:0;">Кейсы</h2>
-        <!-- Оставили только один блок "Бесплатно" -->
         <div class="case-card" onclick="showFreeCases()">
             <div class="case-header">
                 <div class="case-icon">🎁</div>
@@ -90,6 +100,7 @@
     <div id="screen-free" class="screen">
         <h2 style="margin-top:0;">Бесплатные кейсы</h2>
         
+        <!-- Кейс со Звездами -->
         <div class="case-card" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
             <div class="case-header">
                 <div class="case-icon">⭐</div>
@@ -101,6 +112,7 @@
             <button class="btn-action" id="btn-stars-case" onclick="checkSubscription()">Подписаться и крутить</button>
         </div>
 
+        <!-- Кейс с NFT -->
         <div class="case-card premium">
             <div class="case-header">
                 <div class="case-icon">🎁</div>
@@ -110,6 +122,14 @@
                 </div>
             </div>
             <button class="btn-action" id="btn-nft-case" onclick="handleNftCaseClick()">Крутить</button>
+            
+            <!-- Блок содержимого кейса -->
+            <div class="case-content">
+                <div class="case-content-title">Содержимое кейса (шанс)</div>
+                <div class="case-items-grid" id="nft-preview-container">
+                    <!-- Сюда JS автоматически вставит картинки и цены -->
+                </div>
+            </div>
         </div>
 
         <button class="btn-action" onclick="switchScreen('games')" style="background:#333; margin-top:10px;">Назад</button>
@@ -183,10 +203,65 @@
         
         let donateBalance = 0; 
         let bonusBalance = 0;   
+        
         let starsClaimed = false; 
+        let timerInterval = null;
+        let timeLeft = 24 * 60 * 60; 
+
+        // ТУТ ТЕПЕРЬ ВСЕ 7 КАРТИНОК И ПРИМЕРНЫЕ ЦЕНЫ В STARS
+        const nftPrizes = [
+            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
+            { id: 'cake', name: 'Homemade Cake', img: 'cake.png', chance: 0.4, price: 2500 }, 
+            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', chance: 2, price: 1000 },
+            { id: 'socks', name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', chance: 5, price: 500 },
+            { id: 'flame', name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 300 },
+            { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', chance: 12.5, price: 250 },
+            { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 100 }
+        ];
+
+        // Автоматически заполняем блок "Содержимое кейса"
+        function renderCaseContent() {
+            const container = document.getElementById('nft-preview-container');
+            // Сортируем, чтобы самые дорогие были первыми
+            const sortedPrizes = [...nftPrizes].sort((a, b) => b.price - a.price);
+            
+            sortedPrizes.forEach(prize => {
+                const div = document.createElement('div');
+                div.className = 'case-item-preview';
+                div.innerHTML = `
+                    <img src="${prize.img}">
+                    <div class="case-item-price">${prize.price} ⭐</div>
+                `;
+                container.appendChild(div);
+            });
+        }
 
         function updateUI() {
             document.getElementById('user-balance').innerText = donateBalance + bonusBalance;
+        }
+
+        function startTimer() {
+            starsClaimed = true;
+            timeLeft = 24 * 60 * 60; 
+            updateCaseButtons(); 
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    let h = Math.floor(timeLeft / 3600);
+                    let m = Math.floor((timeLeft % 3600) / 60);
+                    let s = timeLeft % 60;
+                    let hStr = h < 10 ? "0" + h : h;
+                    let mStr = m < 10 ? "0" + m : m;
+                    let sStr = s < 10 ? "0" + s : s;
+                    document.getElementById('btn-stars-case').innerText = `⏳ ${hStr}:${mStr}:${sStr}`;
+                } else {
+                    clearInterval(timerInterval);
+                    starsClaimed = false;
+                    updateCaseButtons(); 
+                }
+            }, 1000); 
         }
 
         function switchScreen(screenId) {
@@ -211,9 +286,9 @@
 
             const btnStars = document.getElementById('btn-stars-case');
             if (starsClaimed) {
-                btnStars.innerText = "Ждите 24 часа";
-                btnStars.style.background = "#444";
+                btnStars.classList.add('timer-btn'); 
             } else {
+                btnStars.classList.remove('timer-btn'); 
                 btnStars.innerText = "Подписаться и крутить";
                 btnStars.style.background = "var(--accent)";
             }
@@ -221,7 +296,7 @@
 
         function checkSubscription() {
             if (starsClaimed) {
-                tg.showAlert("Ты уже крутил этот кейс. Возвращайся через 24 часа!");
+                tg.showAlert("Ты уже крутил этот кейс. Возвращайся, когда таймер закончится!");
                 return;
             }
             
@@ -256,16 +331,6 @@
         function handleNftCaseClick() {
             if (hasNft) { showNftConditions(); } else { startRoulette('nft'); }
         }
-
-        const nftPrizes = [
-            { id: 'cat', name: 'Scared Cat', img: 'cat.png', chance: 0.1 },
-            { id: 'cake', name: 'Homemade Cake', img: 'cake.png', chance: 0.4 },
-            { id: 'cream', name: 'Vice Cream', img: 'cream.png', chance: 2 },
-            { id: 'socks', name: 'Fresh Socks', img: 'socks.png', chance: 5 },
-            { id: 'flame', name: 'Chill Flame', img: 'flame.png', chance: 10 },
-            { id: 'stocking', name: 'Xmas Stocking', img: 'stocking.png', chance: 12.5 },
-            { id: 'lolli', name: 'Hypno Lollipop', img: 'lollipop.png', chance: 70 }
-        ];
 
         const starsCasePrizes = nftPrizes.filter(p => p.id !== 'cat');
 
@@ -339,7 +404,7 @@
                     container.style.display = 'none';
                     
                     if (type === 'stars') {
-                        starsClaimed = true;
+                        startTimer(); 
                         if (!isWinNft) {
                             bonusBalance += winItem.amount;
                             updateUI();
@@ -348,7 +413,6 @@
                             wonNftData = winItem;
                             addToInventory(winItem);
                         }
-                        updateCaseButtons();
                     } else if (type === 'nft') {
                         hasNft = true;
                         wonNftData = winItem;
@@ -431,6 +495,7 @@
         }
 
         updateUI();
+        renderCaseContent(); // Запускаем отрисовку содержимого кейса при загрузке
     </script>
 </body>
 </html>
