@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Мой Честный Кейс</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --bg-color: #1a1a1a; --card-bg: #2a2a2a; --text-main: #ffffff; --text-muted: #999999; }
+        body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background-color: var(--card-bg); border-bottom: 1px solid #333; }
+        .balance { background: #333; padding: 5px 15px; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .balance span { color: #ffd700; }
+        .top-up-btn { background-color: #2b8cee; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .live-bar { background-color: var(--card-bg); margin: 10px 15px; padding: 10px; border-radius: 12px; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; }
+        .live-bar::-webkit-scrollbar { display: none; }
+        .live-item { font-size: 24px; }
+        .content { padding: 0 15px; flex: 1; overflow-y: auto; }
+        .case-card { background: linear-gradient(135deg, #4a1c72, #8a2be2); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: transform 0.1s; }
+        .case-card:active { transform: scale(0.98); }
+        .case-icon { font-size: 40px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px; }
+        .case-info h3 { margin: 0 0 5px 0; font-size: 18px; }
+        .case-info p { margin: 0; color: rgba(255,255,255,0.7); font-size: 14px; }
+        .nav-bar { display: flex; justify-content: space-around; background-color: var(--card-bg); padding: 10px 0; border-top: 1px solid #333; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; }
+        .nav-item.active { color: #2b8cee; }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; font-style: normal; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
+        <button class="top-up-btn" onclick="topUp()">Пополнить</button>
+    </div>
+    <div style="padding: 0 15px; font-size: 12px; color: #999;">Привет, <span id="user-name">Гость</span>!</div>
+    <div class="live-bar">
+        <strong style="color: #fff; font-size: 14px; align-self: center; margin-right: 5px;">LIVE</strong>
+        <div class="live-item">🍭</div><div class="live-item">🚀</div><div class="live-item">🎁</div><div class="live-item">💎</div><div class="live-item">👑</div>
+    </div>
+    <div class="content">
+        <div class="case-card" onclick="openCase('free')">
+            <div class="case-icon">🎁</div>
+            <div class="case-info"><h3>Бесплатно</h3><p>2 кейса доступно</p></div>
+        </div>
+        <div class="case-card" style="background: linear-gradient(135deg, #7a2b8e, #d946ef);" onclick="openCase('premium')">
+            <div class="case-icon">💎</div>
+            <div class="case-info"><h3>Premium</h3><p>Лучшие призы</p></div>
+        </div>
+    </div>
+    <div class="nav-bar">
+        <div class="nav-item active"><i>🎮</i>Игры</div><div class="nav-item"><i>🎁</i>Конкурсы</div><div class="nav-item"><i>📋</i>Задания</div><div class="nav-item"><i>🏆</i>Турнир</div><div class="nav-item"><i>👤</i>Профиль</div>
+    </div>
+    <script>
+        const tg = window.Telegram.WebApp; tg.expand(); tg.ready();
+        const user = tg.initDataUnsafe?.user;
+        if (user) { document.getElementById('user-name').innerText = user.first_name; document.getElementById('user-balance').innerText = "25"; }
+        function topUp() { tg.showAlert("Тут будет логика пополнения через Telegram Stars"); }
+        function openCase(caseId) { tg.showPopup({ title: 'Открытие кейса', message: `Ты нажал на кейс: ${caseId}.`, buttons: [{type: 'ok'}] }); }
+    </script>
+</body>
+</html>
