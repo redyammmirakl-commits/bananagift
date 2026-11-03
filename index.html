@@ -51,6 +51,7 @@
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #d946ef; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px #d946ef; }
         
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
+        /* Убрал жесткую ширину, чтобы браузер сам считал */
         .live-item { width: 100px; height: 100px; margin: 0 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
 
@@ -128,7 +129,6 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Бесплатные кейсы</h2>
             
-            <!-- Переименованный кейс "За подписку" -->
             <div class="case-card" style="background: linear-gradient(135deg, #1e3c72, #2a5298);" onclick="openInsideCase('sub')">
                 <div class="case-header">
                     <div class="case-icon">⭐</div>
@@ -242,7 +242,6 @@
 
         let currentCaseType = 'nft'; 
 
-        // --- ТАЙМЕР ---
         let starsClaimed = false; 
         let timerInterval = null;
         let timeLeft = 24 * 60 * 60; 
@@ -275,7 +274,6 @@
             }, 1000); 
         }
 
-        // Призы
         const nftPrizes = [
             { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
             { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', chance: 0.4, price: 2500 }, 
@@ -286,10 +284,8 @@
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 100 }
         ];
 
-        // Для кейса "За подписку" (без кота)
         const subCasePrizes = nftPrizes.filter(p => p.id !== 'cat');
 
-        // --- ЛЕНТА ---
         let liveTrack = document.getElementById('live-track');
         let animationId;
         let offsetX = 0;
@@ -329,7 +325,6 @@
             cancelAnimationFrame(animationId);
         }
 
-        // --- НАВИГАЦИЯ ---
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + screenId).classList.add('active');
@@ -419,7 +414,6 @@
             });
         }
 
-        // --- ПРОКРУТКА ---
         function startSpin() {
             stopLiveTrack();
 
@@ -427,7 +421,6 @@
             let isWinNft = false;
 
             if (currentCaseType === 'nft') {
-                // 100% шанс на NFT для этого кейса
                 const rand = Math.random() * 100;
                 let cumulative = 0;
                 winItem = nftPrizes[nftPrizes.length - 1];
@@ -438,18 +431,14 @@
                 winItem.isNft = true;
                 isWinNft = true;
             } else {
-                // 90% - звезды, 10% - NFT (без кота)
                 const rand = Math.random() * 100;
                 if (rand < 90) {
                     const starAmount = Math.floor(Math.random() * 6) + 5;
                     winItem = { name: `+${starAmount} Stars`, isNft: false, amount: starAmount, img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png' };
                 } else {
-                    // 10% размазаны на NFT из subCasePrizes
                     const randNft = Math.random() * 100;
                     let cumulative = 0;
-                    winItem = subCasePrizes[subCasePrizes.length - 1]; // Леденец (по умолчанию)
-                    // Сумма шансов для NFT без кота = 100% (отфильтровано)
-                    // Распределяем 10% внутри
+                    winItem = subCasePrizes[subCasePrizes.length - 1];
                     const totalNftChance = subCasePrizes.reduce((sum, p) => sum + p.chance, 0);
                     
                     for (let p of subCasePrizes) {
@@ -480,8 +469,17 @@
             liveTrack.style.transition = 'none';
             liveTrack.style.transform = `translate(0px, -50%)`;
 
+            // Ждем отрисовки, чтобы замерить ширину
             setTimeout(() => {
-                const targetOffset = -(winIndex * 120) + (window.innerWidth / 2) - 50;
+                // ИСПРАВЛЕННЫЙ РАСЧЕТ:
+                const firstItem = liveTrack.children[0];
+                // Реальная ширина элемента + отступы (margin 10px слева и справа)
+                const itemWidthWithMargin = firstItem.getBoundingClientRect().width + 20;
+                
+                // Вычисляем, насколько сдвинуть ленту, чтобы нужный элемент встал по центру
+                const containerWidth = document.querySelector('.live-roulette-area').getBoundingClientRect().width;
+                const targetOffset = -(winIndex * itemWidthWithMargin) + (containerWidth / 2) - (itemWidthWithMargin / 2);
+
                 liveTrack.style.transition = 'transform 6s cubic-bezier(0.1, 0.7, 0.1, 1)';
                 liveTrack.style.transform = `translate(${targetOffset}px, -50%)`;
 
