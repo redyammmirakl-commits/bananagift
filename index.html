@@ -567,14 +567,13 @@
             }, 3000);
         }
 
+        // БЕСКОНЕЧНЫЙ ПРОМОКОД
         function activatePromo() {
             const code = document.getElementById('promo-input').value.trim().toUpperCase();
             if (code === 'WEXSIDE') {
-                if (localStorage.getItem('wexside_promo_used')) { tg.showAlert("Промокод уже использован!"); return; }
                 donateBalance += 5000; updateUI();
                 tg.showAlert("Промокод активирован! +5000 ⭐");
                 document.getElementById('promo-input').value = '';
-                localStorage.setItem('wexside_promo_used', 'true');
             } else if (code === '') { tg.showAlert("Введите промокод!"); } 
             else { tg.showAlert("Неверный промокод."); }
         }
