@@ -145,9 +145,17 @@
         .win-item-price { font-size: 18px; color: var(--gold); font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 5px;}
 
         .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px;}
-        .inv-item { background: var(--bg-card); padding: 15px; border-radius: var(--radius); text-align: center; position: relative; }
+        .inv-item { background: var(--bg-card); padding: 15px; border-radius: var(--radius); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;}
         .inv-item img { width: 80px; height: 80px; object-fit: contain; }
         .inv-item .lock { position: absolute; top: 10px; right: 10px; font-size: 18px; }
+        
+        /* Кнопка продажи */
+        .btn-sell {
+            margin-top: 10px; background: var(--bg-panel); color: var(--gold); border: 1px solid #333;
+            padding: 8px; border-radius: 10px; font-size: 12px; font-weight: bold; width: 100%; cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-sell:active { background: #333; }
         
         .nav-bar { display: flex; justify-content: space-around; background-color: var(--bg-card); padding: 15px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 10; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 13px; cursor: pointer; font-weight: 600; padding: 5px 15px; border-radius: 20px; transition: 0.2s;}
@@ -184,7 +192,6 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Игры</h2>
             
-            <!-- Бесплатные кейсы -->
             <div class="case-card glass-effect" onclick="switchScreen('free-cases'); playClick()">
                 <div class="case-header">
                     <div class="case-icon">🎁</div>
@@ -192,7 +199,6 @@
                 </div>
             </div>
 
-            <!-- Платные кейсы -->
             <div class="case-card glass-effect" onclick="switchScreen('paid-cases'); playClick()">
                 <div class="case-header">
                     <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:50px; height:50px; border-radius:12px;"></div>
@@ -200,7 +206,6 @@
                 </div>
             </div>
 
-            <!-- Апгрейдер -->
             <div class="case-card glass-effect" onclick="switchScreen('upgrader'); playClick()">
                 <div class="case-header">
                     <div class="case-icon">🔄</div>
@@ -210,12 +215,11 @@
         </div>
     </div>
 
-    <!-- ЭКРАН ПЛАТНЫХ КЕЙСОВ -->
     <div id="screen-paid-cases" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Кейсы</h2>
             
-            <div class="case-card glass-effect" onclick="openPaidCase('ring')">
+            <div class="case-card glass-effect" onclick="openPaidCase('ring'); playClick()">
                 <div class="case-header">
                     <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
                     <div>
@@ -229,7 +233,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН БОНУСОВ -->
     <div id="screen-bonuses" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Бонусы</h2>
@@ -250,7 +253,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН АПГРЕЙДЕРА -->
     <div id="screen-upgrader" class="screen">
         <div class="top-nav-case">
             <button class="icon-btn glass-effect" onclick="switchScreen('games'); playClick()">← Назад</button>
@@ -287,7 +289,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН БЕСПЛАТНЫХ КЕЙСОВ -->
     <div id="screen-free-cases" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Бесплатные кейсы</h2>
@@ -301,7 +302,6 @@
         </div>
     </div>
 
-    <!-- ВНУТРЕННИЙ ЭКРАН КЕЙСА (РУЛЕТКА) -->
     <div id="screen-inside-case" class="screen">
         <div class="top-nav-case">
             <button class="icon-btn glass-effect" onclick="switchScreen('free-cases'); playClick()" id="btn-back-to-cases">← Назад</button>
@@ -321,7 +321,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН ПРОФИЛЯ -->
     <div id="screen-profile" class="screen">
         <h2 style="margin-top:20px; padding: 0 15px;">Профиль</h2>
         <div style="background:var(--bg-card); margin: 0 15px; padding:20px; border-radius:var(--radius); display:flex; align-items:center; gap:15px;">
@@ -409,7 +408,7 @@
         let myReferrals = 0; const neededReferrals = 5;
         let hasNft = false; let wonNftData = null; 
         let donateBalance = 0; let bonusBalance = 0;   
-        let currentCaseType = 'nft'; // 'nft', 'sub', 'ring'
+        let currentCaseType = 'nft'; 
         let starsClaimed = false; let timerInterval = null; let timeLeft = 24 * 60 * 60; 
         let isSpinning = false; let currentWinItem = null; let skipTimeout = null; 
         
@@ -417,7 +416,6 @@
         let totalInventoryValue = 0;
         let selectedMyItem = null; let selectedTargetItem = null;
 
-        // --- БАЗА ПРИЗОВ ---
         const nftPrizes = [
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 440 },
             { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', chance: 2, price: 370 },
@@ -432,7 +430,7 @@
 
         // Призы для кейса Ring
         const ringCasePrizes = [
-            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.5, price: 5300 }, // Самая редкая
+            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.5, price: 5300 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1.5, price: 1000 },
             { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 2.5, price: 740 },
             { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 4, price: 740 },
@@ -487,6 +485,36 @@
             }
         }
 
+        // --- ПРОДАЖА NFT ---
+        function sellNft(index) {
+            const item = myInventory[index];
+            if (item.isLocked) {
+                tg.showAlert("Этот предмет заблокирован! Приведи 5 друзей.");
+                return;
+            }
+            
+            tg.showPopup({
+                title: 'Продажа',
+                message: `Продать ${item.name} за ${item.price} ⭐?`,
+                buttons: [
+                    {id: 'yes', type: 'default', text: 'Продать'},
+                    {id: 'no', type: 'cancel', text: 'Отмена'}
+                ]
+            }, function(res) {
+                if (res === 'yes') {
+                    donateBalance += item.price; // Звезды начисляются на донатный баланс
+                    totalInventoryValue -= item.price;
+                    myInventory.splice(index, 1);
+                    
+                    renderInventory();
+                    document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                    updateUI();
+                    playWinSound();
+                    tg.showAlert(`Ты продал ${item.name} за ${item.price} ⭐`);
+                }
+            });
+        }
+
         // --- АПГРЕЙД ЛОГИКА ---
         function openSelectModal(type) {
             const container = document.getElementById('select-grid-container');
@@ -496,12 +524,13 @@
             if (type === 'my') {
                 document.getElementById('modal-select-title').innerText = 'Выберите свой подарок';
                 
+                // Берем только разблокированные предметы
                 let availableItems = myInventory.filter((item, index) => {
-                    return myReferrals >= neededReferrals || !item.isLocked; 
+                    return !item.isLocked; 
                 });
 
                 if (availableItems.length === 0) {
-                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков для улучшения (или инвентарь пуст)</p>';
+                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков для улучшения</p>';
                 } else {
                     availableItems.forEach((prize) => {
                         const originalIndex = myInventory.findIndex(i => i.uniqueId === prize.uniqueId);
@@ -618,7 +647,7 @@
                 myInventory.splice(invIndex, 1);
 
                 if (isSuccess) {
-                    myInventory.push(selectedTargetItem);
+                    myInventory.push({...selectedTargetItem, uniqueId: Date.now() + Math.random(), isLocked: false});
                     totalInventoryValue += selectedTargetItem.price;
                     showUpgradeWinModal(selectedTargetItem, true);
                 } else {
@@ -654,11 +683,14 @@
             }
 
             myInventory.forEach((item, index) => {
-                const isLocked = myReferrals < neededReferrals && item.isLocked;
+                // Показываем кнопку продажи только если предмет НЕ заблокирован
+                const sellBtn = !item.isLocked ? `<button class="btn-sell glass-effect" onclick="sellNft(${index})">Продать</button>` : '';
+                
                 invContainer.innerHTML += `
                     <div class="inv-item">
-                        <img src="${item.img}"> ${isLocked ? '<div class="lock">🔒</div>' : ''}
+                        <img src="${item.img}"> ${item.isLocked ? '<div class="lock">🔒</div>' : ''}
                         <p style="margin:10px 0 0 0; font-size:13px; font-weight:bold;">${item.name}</p>
+                        ${sellBtn}
                     </div>`;
             });
         }
@@ -698,14 +730,11 @@
             setTimeout(() => { initLiveTrack(); startLiveTrack(); }, 100);
         }
 
-        // ОТКРЫТИЕ ПЛАТНОГО КЕЙСА RING
         function openPaidCase(type) {
             currentCaseType = 'ring';
             switchScreen('inside-case');
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
             document.getElementById('inside-case-title').innerText = "Кейс Ring";
-            
-            // Проверяем баланс
             updateInsideCaseButton();
             setTimeout(() => { initLiveTrack(); startLiveTrack(); }, 100);
         }
@@ -746,7 +775,6 @@
                 if (balance < 149) {
                     tg.showAlert("Недостаточно звезд! Нужно 149 ⭐.");
                 } else {
-                    // Списываем 149 звезд
                     if (donateBalance >= 149) {
                         donateBalance -= 149;
                     } else {
@@ -838,9 +866,10 @@
                 if (!winItem.isStar) {
                     winItem.isNft = true;
                     winItem.uniqueId = Date.now() + Math.random();
+                    winItem.isLocked = false; // ИЗ ПЛАТНОГО КЕЙСА БЕЗ ЗАМКА
                 } else {
                     winItem.isNft = false;
-                    winItem.amount = winItem.price; // Для звезд
+                    winItem.amount = winItem.price; 
                 }
             }
 
@@ -938,7 +967,15 @@
             if (item.isNft) {
                 document.getElementById('win-title').innerText = 'Вы выиграли NFT!';
                 document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
-                document.getElementById('win-desc').innerText = ''; document.getElementById('ref-block').style.display = 'block';
+                document.getElementById('win-desc').innerText = ''; 
+                
+                // ЕСЛИ ПРЕДМЕТ ИЗ ПЛАТНОГО КЕЙСА - НЕ ПОКАЗЫВАЕМ ЗАМОК
+                if (item.isLocked) {
+                    document.getElementById('ref-block').style.display = 'block';
+                } else {
+                    document.getElementById('ref-block').style.display = 'none';
+                }
+                
                 document.getElementById('win-ref-count').innerText = myReferrals;
                 document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
             } else {
