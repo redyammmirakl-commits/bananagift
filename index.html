@@ -247,20 +247,22 @@
         }
         .contract-slot img { width: 80%; height: 80%; object-fit: contain; transition: all 0.5s ease;}
 
-        /* Визуализация анимации: предметы слетаются в центр */
-        .flying-item {
-            position: fixed; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;
-            background: var(--bg-card); border-radius: 15px; z-index: 1000; pointer-events: none;
-            transition: all 1s cubic-bezier(0.5, -0.5, 0.5, 1.5);
+        /* Анимация слияния */
+        .merge-active .contract-slot {
+            position: absolute; top: 0; left: 50%;
+            transform: translate(-50%, 0) scale(0.5);
+            opacity: 0;
         }
-        .flying-item img { width: 80%; height: 80%; object-fit: contain;}
+        .merge-active .contract-slot:first-child {
+            opacity: 1; transform: translate(-50%, 0) scale(1); z-index: 10;
+        }
 
         /* Черный круг по центру */
         .contract-center-circle {
             width: 100px; height: 100px; border-radius: 50%; background: #000;
             display: flex; justify-content: center; align-items: center; position: relative;
             transition: background-color 0.3s, box-shadow 0.3s; z-index: 50;
-            margin: 20px auto; font-size: 40px;
+            margin: 20px auto; font-size: 40px; color: white;
         }
         .contract-center-circle.success { background: var(--green); box-shadow: 0 0 30px var(--green); }
         .contract-center-circle.fail { background: var(--red); box-shadow: 0 0 30px var(--red); }
@@ -672,10 +674,12 @@
             let source = getCurrentSource();
             let track = document.createElement('div');
             track.className = 'live-track';
-            // Анимация туда-сюда
+            
+            // Устанавливаем анимацию туда-сюда
             track.style.animation = 'scrollBg 20s linear infinite alternate'; 
             
-            for (let i = 0; i < 40; i++) {
+            // Создаем достаточно элементов для заполнения экрана (минимум 40)
+            for (let i = 0; i < 60; i++) {
                 track.innerHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
             }
             
@@ -778,7 +782,7 @@
             document.getElementById('modal-select-title').innerText = `Выберите NFT для слота ${slotIndex + 1}`;
             starsBtn.style.display = 'none';
 
-            // ВАЖНО: Берем только разблокированные NFT, НО РАЗРЕШАЕМ брать копии (проверяем только то, что уже выбрано)
+            // ВАЖНО: Берем только разблокированные NFT, НО РАЗРЕШАЕМ брать копии
             let availableItems = myInventory.filter((item) => {
                 if (item.isLocked) return false;
                 return true; 
@@ -900,7 +904,7 @@
                     flyEl.remove();
                     currentIndex++;
                     animateNextItem();
-                }, 600); // Скорость полета
+                }, 800); // Скорость полета (замедлено для наглядности)
             }
 
             animateNextItem();
