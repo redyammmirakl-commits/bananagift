@@ -135,10 +135,12 @@
 
         /* РУЛЕТКА КЕЙСА (ЖИВАЯ) */
         .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 10px;}
-        .roulette-row { position: relative; width: 100%; height: 70px; overflow: hidden; display: flex; align-items: center; }
+        .roulette-row { position: relative; width: 100%; height: 60px; overflow: hidden; display: flex; align-items: center; }
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--purple); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--purple); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
-        .live-item { width: 60px; height: 60px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+        
+        /* УМЕНЬШИЛ РАЗМЕР ИКОНОК, ЧТОБЫ БОЛЬШЕ ВЛЕЗАЛО */
+        .live-item { width: 50px; height: 50px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
         /* ИДЕАЛЬНАЯ ФОНОВАЯ АНИМАЦИЯ */
@@ -680,9 +682,11 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
-        // Фоновая анимация
+        // ИДЕАЛЬНАЯ ФОНОВАЯ АНИМАЦИЯ
         function initBackgroundAnimation() {
             const container = document.getElementById('roulette-rows-container');
+            
+            // Очищаем полностью перед созданием новой
             container.innerHTML = '';
             
             let source = getCurrentSource();
@@ -691,11 +695,14 @@
             
             // Чтобы не было разрывов, дублируем массив элементов ровно в 2 раза
             let elementsHTML = '';
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 50; i++) {
                 elementsHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
             }
             
+            // Ставим две копии подряд
             track.innerHTML = elementsHTML + elementsHTML;
+            
+            // Принудительно включаем анимацию
             track.style.animation = 'scrollBg 20s linear infinite';
             
             const row = document.createElement('div');
