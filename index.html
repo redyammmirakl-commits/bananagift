@@ -225,7 +225,7 @@
 
             <div class="case-card glass-effect" onclick="switchScreen('paid-cases'); playClick()">
                 <div class="case-header">
-                    <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:50px; height:50px; border-radius:12px;"></div>
+                    <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:50px; height:50px; border-radius:12px;"></div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Кейсы</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Платные кейсы</p></div>
                 </div>
             </div>
@@ -244,11 +244,23 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Кейсы</h2>
             
+            <!-- Кейс Ring -->
             <div class="case-card glass-effect" onclick="openPaidCase('ring'); playClick()">
+                <div class="case-header">
+                    <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
+                    <div>
+                        <h3 style="margin:0 0 5px 0; font-size: 18px;">Ring</h3>
+                        <p style="margin:0; font-size:13px; color:var(--text-muted);">Цена: 149 ⭐</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- НОВЫЙ КЕЙС Multicast -->
+            <div class="case-card glass-effect" onclick="openPaidCase('multicast'); playClick()">
                 <div class="case-header">
                     <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
                     <div>
-                        <h3 style="margin:0 0 5px 0; font-size: 18px;">Ring</h3>
+                        <h3 style="margin:0 0 5px 0; font-size: 18px;">Multicast Case</h3>
                         <p style="margin:0; font-size:13px; color:var(--text-muted);">Цена: 322 ⭐</p>
                     </div>
                 </div>
@@ -334,11 +346,11 @@
             <button class="icon-btn glass-effect" onclick="openPrizes(); playClick()">🎁 Призы</button>
         </div>
         
-        <div class="live-roulette-area">
+        <div class="live-roulette-area" id="roulette-container">
             <!-- Текст мультикаста -->
             <div id="multicast-text">MULTICAST x2</div>
 
-            <!-- 3 ленты -->
+            <!-- 3 ленты (для мультикаста) -->
             <div class="roulette-row" id="row-1">
                 <div class="live-line"></div>
                 <div class="live-track" id="track-1"></div>
@@ -457,8 +469,8 @@
         let starsClaimed = false; let timerInterval = null; let timeLeft = 24 * 60 * 60; 
         
         let isSpinning = false; 
-        let isAnimating = false; // Защита от спама
-        let currentWinItems = []; // Массив для мультикаста
+        let isAnimating = false; 
+        let currentWinItems = []; 
         let skipTimeouts = []; 
 
         let myInventory = []; 
@@ -490,7 +502,7 @@
             { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', price: 370 }
         ].sort((a, b) => a.price - b.price);
 
-        // Призы для кейса Ring
+        // Призы для кейса Ring (обычный)
         const ringCasePrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 5300 },
             { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
@@ -515,14 +527,32 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
         ];
 
-        // Шансы на мультикаст
-        const multicastChances = {
-            x1: 75, // Обычный выигрыш (без комбо)
-            x2: 15, // Шанс на 2 прокрутки
-            x3: 9,  // Шанс на 3 прокрутки
-            x4: 0.9,// Шанс на 4 (можно добавить логику)
-            x5: 0.1 // Шанс на 5
-        };
+        // Призы для кейса Multicast (он же новый за 322)
+        const multicastPrizes = [
+            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 5300 },
+            { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
+            { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1000 },
+            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 1.5, price: 740 },
+            { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1.5, price: 740 },
+            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 2, price: 670 },
+            { name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', chance: 2, price: 670 },
+            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 3, price: 590 },
+            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 3, price: 590 },
+            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 3, price: 590 },
+            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 3, price: 590 },
+            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 4, price: 520 },
+            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 4, price: 520 },
+            { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 5, price: 440 },
+            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 10, price: 440 },
+            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 370 },
+            { name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', chance: 10, price: 370 },
+            { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 25, isStar: true },
+            { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 15, isStar: true },
+            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 10, isStar: true },
+            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
+        ];
+
+        const multicastChances = { x1: 75, x2: 15, x3: 9, x4: 0.9, x5: 0.1 };
 
         // --- БОНУСЫ ---
         function checkBonusSubscription() {
@@ -786,10 +816,10 @@
         }
 
         function openPaidCase(type) {
-            currentCaseType = 'ring';
+            currentCaseType = type;
             switchScreen('inside-case');
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
-            document.getElementById('inside-case-title').innerText = "Кейс Ring";
+            document.getElementById('inside-case-title').innerText = (type === 'ring') ? "Кейс Ring" : "Multicast Case";
             updateInsideCaseButton();
         }
 
@@ -804,6 +834,10 @@
                 if (starsClaimed) { btn.classList.add('timer-btn'); } else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
             } else if (currentCaseType === 'ring') {
                 let balance = donateBalance + bonusBalance;
+                if (balance < 149) { btn.innerText = "Недостаточно ⭐ (149)"; btn.classList.add('timer-btn'); } 
+                else { btn.innerText = "Крутить (149 ⭐)"; btn.classList.remove('timer-btn'); }
+            } else if (currentCaseType === 'multicast') {
+                let balance = donateBalance + bonusBalance;
                 if (balance < 322) { btn.innerText = "Недостаточно ⭐ (322)"; btn.classList.add('timer-btn'); } 
                 else { btn.innerText = "Крутить (322 ⭐)"; btn.classList.remove('timer-btn'); }
             }
@@ -811,17 +845,26 @@
 
         function handleRollClick() {
             if (isAnimating) { skipAllAnimations(); return; }
+            
             if (currentCaseType === 'nft') {
-                if (hasNft) { showNftConditions(); } else { startMulticastSpin(); }
+                if (hasNft) { showNftConditions(); } else { startMulticastSpin(); } // Используем мультикаст (сработает как обычный, если count = 1)
             } else if (currentCaseType === 'sub') {
                 if (starsClaimed) { tg.showAlert("Возвращайся позже!"); } else { checkSubscription(); }
             } else if (currentCaseType === 'ring') {
+                let balance = donateBalance + bonusBalance;
+                if (balance < 149) { tg.showAlert("Нужно 149 ⭐."); } 
+                else {
+                    if (donateBalance >= 149) donateBalance -= 149;
+                    else { let rem = 149 - donateBalance; donateBalance = 0; bonusBalance -= rem; }
+                    updateUI(); startMulticastSpin(true); // true = обычный кейс без мультикаста
+                }
+            } else if (currentCaseType === 'multicast') {
                 let balance = donateBalance + bonusBalance;
                 if (balance < 322) { tg.showAlert("Нужно 322 ⭐."); } 
                 else {
                     if (donateBalance >= 322) donateBalance -= 322;
                     else { let rem = 322 - donateBalance; donateBalance = 0; bonusBalance -= rem; }
-                    updateUI(); startMulticastSpin();
+                    updateUI(); startMulticastSpin(false); // false = с шансом на мультикаст
                 }
             }
         }
@@ -845,7 +888,12 @@
 
         // --- МЕХАНИКА МУЛЬТИКАСТА ---
         function getRandomPrize() {
-            let source = currentCaseType === 'sub' ? subCasePrizes : (currentCaseType === 'ring' ? ringCasePrizes : nftPrizes);
+            let source;
+            if (currentCaseType === 'sub') source = subCasePrizes;
+            else if (currentCaseType === 'ring') source = ringCasePrizes;
+            else if (currentCaseType === 'multicast') source = multicastPrizes;
+            else source = nftPrizes;
+
             const rand = Math.random() * 100; let cumulative = 0;
             let winItem = source[source.length - 1];
             for (let p of source) { cumulative += p.chance; if (rand <= cumulative) { winItem = p; break; } }
@@ -867,13 +915,18 @@
             return 1;
         }
 
-        function startMulticastSpin() {
+        function startMulticastSpin(isNormalCase = false) {
             if (isAnimating) return;
             isAnimating = true;
             updateInsideCaseButton();
             playSpinSound();
 
-            let count = getMulticastCount();
+            let count = 1; // По умолчанию 1
+            if (!isNormalCase) {
+                // Если это мультикаст-кейс, проверяем шанс
+                count = getMulticastCount();
+            }
+
             currentWinItems = [];
             
             document.getElementById('row-1').style.opacity = 1;
@@ -902,7 +955,12 @@
                 let rowDiv = document.getElementById(`row-${index + 1}`);
                 rowDiv.style.opacity = 1;
 
-                let source = currentCaseType === 'sub' ? subCasePrizes : (currentCaseType === 'ring' ? ringCasePrizes : nftPrizes);
+                let source;
+                if (currentCaseType === 'sub') source = subCasePrizes;
+                else if (currentCaseType === 'ring') source = ringCasePrizes;
+                else if (currentCaseType === 'multicast') source = multicastPrizes;
+                else source = nftPrizes;
+
                 for (let i = 0; i < 60; i++) { 
                     track.innerHTML += `<div class="live-item"><img src="${source[Math.floor(Math.random() * source.length)].img}"></div>`; 
                 }
@@ -971,7 +1029,12 @@
         function openPrizes() {
             const container = document.getElementById('prizes-grid-container');
             container.innerHTML = '';
-            let source = currentCaseType === 'sub' ? subCasePrizes : (currentCaseType === 'ring' ? ringCasePrizes : nftPrizes);
+            let source;
+            if (currentCaseType === 'sub') source = subCasePrizes;
+            else if (currentCaseType === 'ring') source = ringCasePrizes;
+            else if (currentCaseType === 'multicast') source = multicastPrizes;
+            else source = nftPrizes;
+
             const sortedPrizes = [...source].sort((a, b) => b.price - a.price);
             sortedPrizes.forEach(prize => {
                 container.innerHTML += `<div class="prize-item"><img src="${prize.img}"><div style="font-size:13px; margin-bottom:3px; font-weight:bold;">${prize.name}</div><div class="prize-price">${prize.price} ⭐</div></div>`;
