@@ -17,6 +17,7 @@
             --red: #ff4444;
             --green: #4caf50;
             --radius: 20px; 
+            --purple: #a855f7;
         }
         body {
             margin: 0; padding: 0; background-color: var(--bg-main);
@@ -87,7 +88,6 @@
         .selector-content { font-size: 13px; font-weight: bold; text-align: center; display: flex; flex-direction: column; align-items: center;}
         .selector-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px;}
 
-        /* Кнопка добавления звезд */
         .add-stars-btn {
             position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
             background: var(--accent); color: white; border: none; padding: 5px 10px;
@@ -102,7 +102,6 @@
         .btn-upgrade { width: 100%; background: linear-gradient(90deg, #6a5acd, #8a2be2); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: auto; box-shadow: 0 4px 15px rgba(138,43,226,0.3);}
         .btn-upgrade:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
 
-        /* Модалка выбора */
         .modal-select { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; flex-direction: column; padding: 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
         .modal-select.active { display: flex; }
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
@@ -114,14 +113,31 @@
 
         #screen-inside-case { background: var(--bg-main); position: relative; display: none; flex-direction: column; justify-content: space-between; }
         #screen-inside-case.active { display: flex; }
-        .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 20px 0; }
-        .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--accent); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--accent); }
+        
+        /* МУЛЬТИ-РУЛЕТКА */
+        .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 15px;}
+        
+        .roulette-row {
+            position: relative; width: 100%; height: 80px; overflow: hidden; display: flex; align-items: center;
+        }
+        .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--purple); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--purple); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
-        .live-item { width: 100px; height: 100px; margin: 0 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: var(--radius); box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+        .live-item { width: 70px; height: 70px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
+
+        /* Эффект мультикаста */
+        #multicast-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 60px; font-weight: 900; color: var(--purple);
+            text-shadow: 0 0 20px var(--purple), 0 0 40px var(--purple);
+            z-index: 100; pointer-events: none; display: none;
+            animation: pulse 0.5s infinite alternate;
+        }
+        @keyframes pulse { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.1); } }
+
         .case-title-area { text-align: center; z-index: 10; margin-bottom: 10px;}
         .case-title-area h2 { margin: 0; font-size: 24px; font-weight: 800;}
-        .bottom-panel { padding: 20px 15px; background: var(--bg-card); border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.2);}
+        .bottom-panel { padding: 15px; background: var(--bg-card); border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.2);}
         .bottom-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-secondary { flex: 1; background: var(--bg-panel); border: none; color: white; padding: 16px; border-radius: 18px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
         .btn-roll-big { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
@@ -209,7 +225,7 @@
 
             <div class="case-card glass-effect" onclick="switchScreen('paid-cases'); playClick()">
                 <div class="case-header">
-                    <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:50px; height:50px; border-radius:12px;"></div>
+                    <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:50px; height:50px; border-radius:12px;"></div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Кейсы</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Платные кейсы</p></div>
                 </div>
             </div>
@@ -223,16 +239,17 @@
         </div>
     </div>
 
+    <!-- ЭКРАН ПЛАТНЫХ КЕЙСОВ -->
     <div id="screen-paid-cases" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Кейсы</h2>
             
             <div class="case-card glass-effect" onclick="openPaidCase('ring'); playClick()">
                 <div class="case-header">
-                    <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
+                    <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
                     <div>
                         <h3 style="margin:0 0 5px 0; font-size: 18px;">Ring</h3>
-                        <p style="margin:0; font-size:13px; color:var(--text-muted);">Цена: 149 ⭐</p>
+                        <p style="margin:0; font-size:13px; color:var(--text-muted);">Цена: 322 ⭐</p>
                     </div>
                 </div>
             </div>
@@ -316,10 +333,26 @@
             <button class="icon-btn glass-effect" onclick="switchScreen('free-cases'); playClick()" id="btn-back-to-cases">← Назад</button>
             <button class="icon-btn glass-effect" onclick="openPrizes(); playClick()">🎁 Призы</button>
         </div>
+        
         <div class="live-roulette-area">
-            <div class="live-line"></div>
-            <div class="live-track" id="live-track"></div>
+            <!-- Текст мультикаста -->
+            <div id="multicast-text">MULTICAST x2</div>
+
+            <!-- 3 ленты -->
+            <div class="roulette-row" id="row-1">
+                <div class="live-line"></div>
+                <div class="live-track" id="track-1"></div>
+            </div>
+            <div class="roulette-row" id="row-2" style="opacity: 0; pointer-events: none;">
+                <div class="live-line"></div>
+                <div class="live-track" id="track-2"></div>
+            </div>
+            <div class="roulette-row" id="row-3" style="opacity: 0; pointer-events: none;">
+                <div class="live-line"></div>
+                <div class="live-track" id="track-3"></div>
+            </div>
         </div>
+
         <div class="case-title-area"><h2 id="inside-case-title">Кейс</h2></div>
         <div class="bottom-panel">
             <div class="bottom-row">
@@ -351,15 +384,11 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ВЫБОРА ДЛЯ АПГРЕЙДА -->
     <div id="modal-select" class="modal-select">
         <div class="modal-title" id="modal-select-title">Выберите подарок</div>
-        
-        <!-- Кнопка выбора звезд (появляется только для "Ваш подарок") -->
         <div id="select-stars-btn" style="display:none; background: var(--accent); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 15px; cursor: pointer; font-weight: bold; font-size: 16px;" onclick="selectStarsItem(); playClick()">
             ⭐ Выбрать звезды с баланса
         </div>
-
         <div class="select-grid" id="select-grid-container"></div>
         <button class="close-modal-btn glass-effect" onclick="closeSelectModal(); playClick()">Отмена</button>
     </div>
@@ -426,23 +455,32 @@
         let donateBalance = 0; let bonusBalance = 0;   
         let currentCaseType = 'nft'; 
         let starsClaimed = false; let timerInterval = null; let timeLeft = 24 * 60 * 60; 
-        let isSpinning = false; let currentWinItem = null; let skipTimeout = null; 
         
+        let isSpinning = false; 
+        let isAnimating = false; // Защита от спама
+        let currentWinItems = []; // Массив для мультикаста
+        let skipTimeouts = []; 
+
         let myInventory = []; 
         let totalInventoryValue = 0;
         let selectedMyItem = null; let selectedTargetItem = null;
-        
-        let starsAddedToUpgrade = 0; // Сколько звезд добавили к апгрейду
+        let starsAddedToUpgrade = 0;
 
-        // ВСЕ ДОСТУПНЫЕ ДЛЯ АПГРЕЙДА NFT
+        // --- БАЗА ПРИЗОВ ---
         const allNftPrizes = [
-            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', price: 5000 },
             { id: 'signet', name: 'Signet Ring', img: 'Без названия116_20261104163406.png', price: 5300 },
-            { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', price: 546 },
+            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', price: 5000 },
             { id: 'vbox', name: 'Valentine Box', img: 'Без названия117_20261104163651.png', price: 1000 },
             { id: 'santa', name: 'Santa Hat', img: 'Без названия119_20261104164244.png', price: 740 },
             { id: 'bunny', name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', price: 740 },
-            { id: 'moon', name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', price: 520 }, // Новая иконка
+            { id: 'perfume', name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', price: 670 },
+            { id: 'mask', name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', price: 670 },
+            { id: 'loot', name: 'Loot Bag', img: 'Без названия125_20261104175552.png', price: 590 },
+            { id: 'snake', name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', price: 590 },
+            { id: 'cigar', name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', price: 590 },
+            { id: 'eye', name: 'Evil Eye', img: 'Без названия130_20261104181340.png', price: 590 },
+            { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', price: 546 },
+            { id: 'moon', name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', price: 520 },
             { id: 'sword', name: 'Light Sword', img: 'Без названия122_20261104165019.png', price: 520 },
             { id: 'liberty', name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', price: 440 },
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', price: 440 },
@@ -452,99 +490,78 @@
             { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', price: 370 }
         ].sort((a, b) => a.price - b.price);
 
-        const nftPrizes = [
-            { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 440 },
-            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', chance: 2, price: 370 },
-            { id: 'socks', name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', chance: 5, price: 370 },
-            { id: 'flame', name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 370 },
-            { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', chance: 12.5, price: 370 },
-            { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', chance: 0.4, price: 546 },
-            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 }
-        ].sort((a, b) => a.price - b.price);
-        
-        const subCasePrizes = nftPrizes.filter(p => p.id !== 'cat');
-
+        // Призы для кейса Ring
         const ringCasePrizes = [
-            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.5, price: 5300 },
-            { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1.5, price: 1000 },
-            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 2.5, price: 740 },
-            { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 4, price: 740 },
-            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 5, price: 520 }, // Новая иконка
-            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 8, price: 520 },
-            { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 10, price: 440 },
-            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 15, price: 440 },
-            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 20, price: 370 },
+            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 5300 },
+            { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
+            { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1000 },
+            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 1.5, price: 740 },
+            { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1.5, price: 740 },
+            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 2, price: 670 },
+            { name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', chance: 2, price: 670 },
+            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 3, price: 590 },
+            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 3, price: 590 },
+            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 3, price: 590 },
+            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 3, price: 590 },
+            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 4, price: 520 },
+            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 4, price: 520 },
+            { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 5, price: 440 },
+            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 10, price: 440 },
+            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 370 },
+            { name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', chance: 10, price: 370 },
+            { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 25, isStar: true },
+            { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 15, isStar: true },
             { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 10, isStar: true },
-            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 23.5, price: 5, isStar: true }
+            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
         ];
 
-        // --- БОНУСЫ И ПРОМОКОДЫ ---
+        // Шансы на мультикаст
+        const multicastChances = {
+            x1: 75, // Обычный выигрыш (без комбо)
+            x2: 15, // Шанс на 2 прокрутки
+            x3: 9,  // Шанс на 3 прокрутки
+            x4: 0.9,// Шанс на 4 (можно добавить логику)
+            x5: 0.1 // Шанс на 5
+        };
+
+        // --- БОНУСЫ ---
         function checkBonusSubscription() {
             tg.openTelegramLink('https://t.me/bananagiftcaser');
             setTimeout(() => {
                 tg.showPopup({
-                    title: 'Проверка',
-                    message: 'Ты подписался на канал?',
-                    buttons: [
-                        {id: 'yes', type: 'default', text: 'Да, подписался'},
-                        {id: 'no', type: 'cancel', text: 'Нет'}
-                    ]
+                    title: 'Проверка', message: 'Ты подписался на канал?',
+                    buttons: [{id: 'yes', type: 'default', text: 'Да'}, {id: 'no', type: 'cancel', text: 'Нет'}]
                 }, function(res) {
-                    if (res === 'yes') {
-                        donateBalance += 1; 
-                        updateUI();
-                        tg.showAlert("Спасибо за подписку! Тебе начислено 1 ⭐");
-                    }
+                    if (res === 'yes') { donateBalance += 1; updateUI(); tg.showAlert("Спасибо! +1 ⭐"); }
                 });
             }, 3000);
         }
 
         function activatePromo() {
             const code = document.getElementById('promo-input').value.trim().toUpperCase();
-            const promoUsed = localStorage.getItem('wexside_promo_used');
-
             if (code === 'WEXSIDE') {
-                if (promoUsed) {
-                    tg.showAlert("Этот промокод уже был использован!");
-                    return;
-                }
-                donateBalance += 5000;
-                updateUI();
-                tg.showAlert("Промокод активирован! Тебе начислено 5000 ⭐");
+                if (localStorage.getItem('wexside_promo_used')) { tg.showAlert("Промокод уже использован!"); return; }
+                donateBalance += 5000; updateUI();
+                tg.showAlert("Промокод активирован! +5000 ⭐");
                 document.getElementById('promo-input').value = '';
                 localStorage.setItem('wexside_promo_used', 'true');
-            } else if (code === '') {
-                tg.showAlert("Введите промокод!");
-            } else {
-                tg.showAlert("Неверный промокод.");
-            }
+            } else if (code === '') { tg.showAlert("Введите промокод!"); } 
+            else { tg.showAlert("Неверный промокод."); }
         }
 
-        // --- ПРОДАЖА NFT ---
+        // --- ПРОДАЖА ---
         function sellNft(index) {
             const item = myInventory[index];
-            if (item.isLocked) {
-                tg.showAlert("Этот предмет заблокирован! Приведи 5 друзей.");
-                return;
-            }
-            
+            if (item.isLocked) { tg.showAlert("Предмет заблокирован!"); return; }
             tg.showPopup({
-                title: 'Продажа',
-                message: `Продать ${item.name} за ${item.price} ⭐?`,
-                buttons: [
-                    {id: 'yes', type: 'default', text: 'Продать'},
-                    {id: 'no', type: 'cancel', text: 'Отмена'}
-                ]
+                title: 'Продажа', message: `Продать ${item.name} за ${item.price} ⭐?`,
+                buttons: [{id: 'yes', type: 'default', text: 'Продать'}, {id: 'no', type: 'cancel', text: 'Отмена'}]
             }, function(res) {
                 if (res === 'yes') {
-                    donateBalance += item.price; 
-                    totalInventoryValue -= item.price;
+                    donateBalance += item.price; totalInventoryValue -= item.price;
                     myInventory.splice(index, 1);
-                    
-                    renderInventory();
-                    document.getElementById('inv-price-val').innerText = totalInventoryValue;
-                    updateUI();
-                    playWinSound();
+                    renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                    updateUI(); playWinSound();
                     tg.showAlert(`Ты продал ${item.name} за ${item.price} ⭐`);
                 }
             });
@@ -559,14 +576,11 @@
             
             if (type === 'my') {
                 document.getElementById('modal-select-title').innerText = 'Выберите свой подарок';
-                starsBtn.style.display = 'block'; // Показываем кнопку звезд
+                starsBtn.style.display = 'block'; 
                 
-                let availableItems = myInventory.filter((item, index) => {
-                    return !item.isLocked; 
-                });
-
+                let availableItems = myInventory.filter((item) => !item.isLocked);
                 if (availableItems.length === 0) {
-                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков (или все заблокированы)</p>';
+                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков</p>';
                 } else {
                     availableItems.forEach((prize) => {
                         const originalIndex = myInventory.findIndex(i => i.uniqueId === prize.uniqueId);
@@ -574,24 +588,23 @@
                         div.className = 'select-item';
                         div.onclick = () => { 
                             selectedMyItem = { ...prize, invIndex: originalIndex };
-                            starsAddedToUpgrade = 0; // Сбрасываем добавленные звезды
-                            document.getElementById('btn-add-stars').style.display = 'block'; // Показываем кнопку "+ Звезды"
-                            updateMyItemDisplay();
-                            calculateChance(); closeSelectModal(); playClick(); 
+                            starsAddedToUpgrade = 0; 
+                            document.getElementById('btn-add-stars').style.display = 'block';
+                            updateMyItemDisplay(); calculateChance(); closeSelectModal(); playClick(); 
                         };
                         div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
                         container.appendChild(div);
                     });
                 }
             } else {
-                starsBtn.style.display = 'none'; // Прячем кнопку звезд
+                starsBtn.style.display = 'none';
                 document.getElementById('modal-select-title').innerText = 'Выберите желаемый подарок';
                 let availableTargets = allNftPrizes;
                 if (selectedMyItem) {
                     availableTargets = allNftPrizes.filter(p => p.price > (selectedMyItem.price + starsAddedToUpgrade));
                 }
                 if (availableTargets.length === 0) {
-                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет предметов дороже вашего</p>';
+                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет предметов дороже</p>';
                 } else {
                     availableTargets.forEach(prize => {
                         const div = document.createElement('div');
@@ -609,74 +622,35 @@
             modal.classList.add('active');
         }
 
-        // Функция выбора звезд вместо NFT
         function selectStarsItem() {
             let balance = donateBalance + bonusBalance;
-            if (balance <= 0) { tg.showAlert("У вас нет звезд на балансе!"); return; }
-            
-            // Спрашиваем, сколько звезд вложить
-            tg.showPopup({
-                title: 'Ввод звезд',
-                message: `Сколько звезд использовать? (Доступно: ${balance})`,
-                buttons: [
-                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
-                ]
-            });
-            
-            // Так как Telegram WebApp не поддерживает текстовый ввод в попапе, 
-            // мы используем prompt браузера (он работает на iOS и Android)
+            if (balance <= 0) { tg.showAlert("У вас нет звезд!"); return; }
             let amount = prompt(`Введите количество звезд (Доступно: ${balance}):`, "100");
-            if (amount === null) return; // Отмена
-            amount = parseInt(amount);
-            
-            if (isNaN(amount) || amount <= 0) {
-                tg.showAlert("Введите корректное число!"); return;
-            }
-            if (amount > balance) {
-                tg.showAlert("Недостаточно звезд на балансе!"); return;
-            }
+            if (amount === null) return; amount = parseInt(amount);
+            if (isNaN(amount) || amount <= 0 || amount > balance) { tg.showAlert("Ошибка ввода!"); return; }
 
-            selectedMyItem = {
-                name: `${amount} Stars`,
-                img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png',
-                price: amount,
-                isStarsOnly: true
-            };
+            selectedMyItem = { name: `${amount} Stars`, img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', price: amount, isStarsOnly: true };
             starsAddedToUpgrade = 0;
-            document.getElementById('btn-add-stars').style.display = 'none'; // Скрываем кнопку добавить звезды
-            updateMyItemDisplay();
-            calculateChance();
-            closeSelectModal();
+            document.getElementById('btn-add-stars').style.display = 'none'; 
+            updateMyItemDisplay(); calculateChance(); closeSelectModal();
         }
 
-        // Добавление звезд к выбранному NFT
         function addStarsToUpgrade() {
             if (!selectedMyItem || selectedMyItem.isStarsOnly) return;
-            
             let balance = donateBalance + bonusBalance;
-            if (balance <= 0) { tg.showAlert("У вас нет звезд на балансе!"); return; }
-
+            if (balance <= 0) { tg.showAlert("Нет звезд!"); return; }
             let amount = prompt(`Сколько звезд добавить к ${selectedMyItem.name}? (Доступно: ${balance})`, "50");
-            if (amount === null) return;
-            amount = parseInt(amount);
-
-            if (isNaN(amount) || amount <= 0) {
-                tg.showAlert("Введите корректное число!"); return;
-            }
-            if (amount > balance) {
-                tg.showAlert("Недостаточно звезд на балансе!"); return;
-            }
+            if (amount === null) return; amount = parseInt(amount);
+            if (isNaN(amount) || amount <= 0 || amount > balance) { tg.showAlert("Ошибка!"); return; }
 
             starsAddedToUpgrade += amount;
-            updateMyItemDisplay();
-            calculateChance();
+            updateMyItemDisplay(); calculateChance();
         }
 
         function updateMyItemDisplay() {
             if (selectedMyItem.isStarsOnly) {
                 document.getElementById('my-item-content').innerHTML = `<img src="${selectedMyItem.img}" class="selector-img">${selectedMyItem.price} ⭐`;
             } else {
-                let totalPrice = selectedMyItem.price + starsAddedToUpgrade;
                 let text = selectedMyItem.name;
                 if (starsAddedToUpgrade > 0) text += ` + ${starsAddedToUpgrade} ⭐`;
                 document.getElementById('my-item-content').innerHTML = `<img src="${selectedMyItem.img}" class="selector-img">${text}`;
@@ -686,22 +660,18 @@
         function closeSelectModal() { document.getElementById('modal-select').classList.remove('active'); }
 
         function setMultiplier(mult, btnElement) {
-            if (!selectedMyItem) { tg.showAlert("Сначала выберите свой подарок!"); return; }
+            if (!selectedMyItem) { tg.showAlert("Выберите подарок!"); return; }
             document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
-            
             let currentPrice = selectedMyItem.price + starsAddedToUpgrade;
             let targetPrice = currentPrice * mult;
-            let closestPrize = null;
-            let minDiff = Infinity;
-            
+            let closestPrize = null, minDiff = Infinity;
             allNftPrizes.forEach(p => {
                 if (p.price > currentPrice) {
                     let diff = Math.abs(p.price - targetPrice);
                     if (diff < minDiff) { minDiff = diff; closestPrize = p; }
                 }
             });
-            
             if (closestPrize) {
                 selectedTargetItem = closestPrize;
                 document.getElementById('target-item-content').innerHTML = `<img src="${closestPrize.img}" class="selector-img">${closestPrize.name}`;
@@ -714,14 +684,11 @@
             if (!selectedMyItem || !selectedTargetItem) {
                 document.getElementById('upgrade-chance').innerText = '0%';
                 document.getElementById('upgrade-wheel').style.setProperty('--chance', 0);
-                btn.disabled = true;
-                return;
+                btn.disabled = true; return;
             }
-            
             let totalMyPrice = selectedMyItem.price + starsAddedToUpgrade;
             let chance = (totalMyPrice / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
-            
             document.getElementById('upgrade-chance').innerText = chance.toFixed(1) + '%';
             document.getElementById('upgrade-wheel').style.setProperty('--chance', chance);
             btn.disabled = false;
@@ -729,57 +696,32 @@
 
         function doUpgrade() {
             if (!selectedMyItem || !selectedTargetItem) return;
-
             let totalMyPrice = selectedMyItem.price + starsAddedToUpgrade;
             let chance = (totalMyPrice / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
-
             const isSuccess = Math.random() * 100 <= chance;
             const btn = document.getElementById('btn-do-upgrade');
             const arrow = document.getElementById('spin-arrow');
             
-            btn.disabled = true;
-            btn.innerText = "Крутим...";
-            playSpinSound();
+            btn.disabled = true; btn.innerText = "Крутим..."; playSpinSound();
 
-            let targetAngle = 0;
-            if (isSuccess) {
-                targetAngle = Math.random() * (chance * 3.6);
-            } else {
-                let redStartAngle = chance * 3.6;
-                let redEndAngle = 360;
-                targetAngle = redStartAngle + Math.random() * (redEndAngle - redStartAngle);
-            }
-
+            let targetAngle = isSuccess ? Math.random() * (chance * 3.6) : (chance * 3.6) + Math.random() * (360 - (chance * 3.6));
             const totalRotation = 360 * 5 + targetAngle;
             arrow.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
             arrow.style.transform = `translate(-50%, -100%) rotate(${totalRotation}deg)`;
 
             setTimeout(() => {
-                stopSpinSound();
-                playWinSound();
-
-                // Списываем звезды с баланса, если они использовались
-                let starsToSpend = starsAddedToUpgrade;
-                if (selectedMyItem.isStarsOnly) starsToSpend += selectedMyItem.price;
-                
+                stopSpinSound(); playWinSound();
+                let starsToSpend = starsAddedToUpgrade + (selectedMyItem.isStarsOnly ? selectedMyItem.price : 0);
                 if (starsToSpend > 0) {
-                    if (donateBalance >= starsToSpend) {
-                        donateBalance -= starsToSpend;
-                    } else {
-                        let remainder = starsToSpend - donateBalance;
-                        donateBalance = 0;
-                        bonusBalance -= remainder;
-                    }
+                    if (donateBalance >= starsToSpend) donateBalance -= starsToSpend;
+                    else { let rem = starsToSpend - donateBalance; donateBalance = 0; bonusBalance -= rem; }
                     updateUI();
                 }
-
-                // Удаляем предмет, если он был
                 if (!selectedMyItem.isStarsOnly) {
                     totalInventoryValue -= myInventory[selectedMyItem.invIndex].price;
                     myInventory.splice(selectedMyItem.invIndex, 1);
                 }
-
                 if (isSuccess) {
                     myInventory.push({...selectedTargetItem, uniqueId: Date.now() + Math.random(), isLocked: false});
                     totalInventoryValue += selectedTargetItem.price;
@@ -787,48 +729,31 @@
                 } else {
                     showUpgradeWinModal(selectedTargetItem, false);
                 }
-
-                renderInventory();
-                document.getElementById('inv-price-val').innerText = totalInventoryValue;
-                
-                selectedMyItem = null;
-                selectedTargetItem = null;
-                starsAddedToUpgrade = 0;
+                renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                selectedMyItem = null; selectedTargetItem = null; starsAddedToUpgrade = 0;
                 document.getElementById('my-item-content').innerText = 'Выбрать';
                 document.getElementById('target-item-content').innerText = 'Выбрать';
                 document.getElementById('btn-add-stars').style.display = 'none';
                 document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
                 calculateChance();
-                
-                arrow.style.transition = 'none';
-                arrow.style.transform = 'translate(-50%, -100%) rotate(0deg)';
-                
-                btn.innerText = "Улучшить";
-                btn.disabled = false;
-
+                arrow.style.transition = 'none'; arrow.style.transform = 'translate(-50%, -100%) rotate(0deg)';
+                btn.innerText = "Улучшить"; btn.disabled = false;
             }, 4100);
         }
 
         function renderInventory() {
             const invContainer = document.getElementById('inventory-container');
             invContainer.innerHTML = '';
-            
             if (myInventory.length === 0) {
-                invContainer.innerHTML = '<p style="color:var(--text-muted); font-size:14px; grid-column: span 2; text-align:center;" id="empty-inv-text">Инвентарь пуст</p>';
-                return;
+                invContainer.innerHTML = '<p style="color:var(--text-muted); font-size:14px; grid-column: span 2; text-align:center;">Инвентарь пуст</p>'; return;
             }
-
             myInventory.forEach((item, index) => {
                 const sellBtn = !item.isLocked ? `<button class="btn-sell glass-effect" onclick="sellNft(${index})">Продать</button>` : '';
-                invContainer.innerHTML += `
-                    <div class="inv-item">
-                        <img src="${item.img}"> ${item.isLocked ? '<div class="lock">🔒</div>' : ''}
-                        <p style="margin:10px 0 0 0; font-size:13px; font-weight:bold;">${item.name}</p>
-                        ${sellBtn}
-                    </div>`;
+                invContainer.innerHTML += `<div class="inv-item"><img src="${item.img}"> ${item.isLocked ? '<div class="lock">🔒</div>' : ''}<p style="margin:10px 0 0 0; font-size:13px; font-weight:bold;">${item.name}</p>${sellBtn}</div>`;
             });
         }
 
+        // --- КЕЙСЫ ЛОГИКА ---
         function startTimer() {
             starsClaimed = true; timeLeft = 24 * 60 * 60; updateInsideCaseButton();
             if (timerInterval) clearInterval(timerInterval);
@@ -836,7 +761,7 @@
                 if (timeLeft > 0) {
                     timeLeft--;
                     let h = Math.floor(timeLeft / 3600), m = Math.floor((timeLeft % 3600) / 60), s = timeLeft % 60;
-                    if(currentCaseType === 'sub' && !isSpinning) {
+                    if(currentCaseType === 'sub' && !isAnimating) {
                         document.getElementById('btn-roll-inside').innerText = `⏳ ${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
                     }
                 } else { clearInterval(timerInterval); starsClaimed = false; updateInsideCaseButton(); }
@@ -847,12 +772,9 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + screenId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             if(screenId === 'games' || screenId === 'inside-case' || screenId === 'upgrader' || screenId === 'paid-cases') document.querySelectorAll('.nav-item')[0].classList.add('active');
             if(screenId === 'bonuses') document.querySelectorAll('.nav-item')[2].classList.add('active');
             if(screenId === 'profile') document.querySelectorAll('.nav-item')[4].classList.add('active');
-            
-            if(screenId === 'games') stopLiveTrack();
         }
 
         function openInsideCase(type) {
@@ -861,7 +783,6 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('free-cases');
             document.getElementById('inside-case-title').innerText = (type === 'sub') ? "За подписку" : "Бесплатный NFT";
             updateInsideCaseButton();
-            setTimeout(() => { initLiveTrack(); startLiveTrack(); }, 100);
         }
 
         function openPaidCase(type) {
@@ -870,208 +791,187 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
             document.getElementById('inside-case-title').innerText = "Кейс Ring";
             updateInsideCaseButton();
-            setTimeout(() => { initLiveTrack(); startLiveTrack(); }, 100);
         }
 
         function updateInsideCaseButton() {
             const btn = document.getElementById('btn-roll-inside');
-            if (isSpinning) { btn.innerText = "Пропустить анимацию"; btn.classList.add('skip-btn'); btn.classList.remove('timer-btn'); return; }
+            if (isAnimating) { btn.innerText = "Пропустить"; btn.classList.add('skip-btn'); btn.classList.remove('timer-btn'); return; }
             btn.classList.remove('skip-btn');
             
             if (currentCaseType === 'nft') {
-                if (hasNft) { btn.innerText = "Мои условия (0/5)"; btn.classList.add('timer-btn'); } 
-                else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
+                if (hasNft) { btn.innerText = "Мои условия (0/5)"; btn.classList.add('timer-btn'); } else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
             } else if (currentCaseType === 'sub') {
-                if (starsClaimed) { btn.classList.add('timer-btn'); } 
-                else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
+                if (starsClaimed) { btn.classList.add('timer-btn'); } else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
             } else if (currentCaseType === 'ring') {
                 let balance = donateBalance + bonusBalance;
-                if (balance < 149) {
-                    btn.innerText = "Недостаточно ⭐ (149)";
-                    btn.classList.add('timer-btn');
-                } else {
-                    btn.innerText = "Крутить (149 ⭐)";
-                    btn.classList.remove('timer-btn');
-                }
+                if (balance < 322) { btn.innerText = "Недостаточно ⭐ (322)"; btn.classList.add('timer-btn'); } 
+                else { btn.innerText = "Крутить (322 ⭐)"; btn.classList.remove('timer-btn'); }
             }
         }
 
         function handleRollClick() {
-            if (isSpinning) { skipAnimation(); return; }
-            
+            if (isAnimating) { skipAllAnimations(); return; }
             if (currentCaseType === 'nft') {
-                if (hasNft) { showNftConditions(); } else { startSpin(); }
+                if (hasNft) { showNftConditions(); } else { startMulticastSpin(); }
             } else if (currentCaseType === 'sub') {
-                if (starsClaimed) { tg.showAlert("Ты уже крутил этот кейс. Возвращайся позже!"); } 
-                else { checkSubscription(); }
+                if (starsClaimed) { tg.showAlert("Возвращайся позже!"); } else { checkSubscription(); }
             } else if (currentCaseType === 'ring') {
                 let balance = donateBalance + bonusBalance;
-                if (balance < 149) {
-                    tg.showAlert("Недостаточно звезд! Нужно 149 ⭐.");
-                } else {
-                    if (donateBalance >= 149) {
-                        donateBalance -= 149;
-                    } else {
-                        let remainder = 149 - donateBalance;
-                        donateBalance = 0;
-                        bonusBalance -= remainder;
-                    }
-                    updateUI();
-                    startSpin();
+                if (balance < 322) { tg.showAlert("Нужно 322 ⭐."); } 
+                else {
+                    if (donateBalance >= 322) donateBalance -= 322;
+                    else { let rem = 322 - donateBalance; donateBalance = 0; bonusBalance -= rem; }
+                    updateUI(); startMulticastSpin();
                 }
             }
         }
 
         function checkSubscription() {
             tg.showPopup({
-                title: 'Подписка', message: 'Чтобы открыть кейс, подпишись на канал @bananagiftcaser',
-                buttons: [{id: 'open', type: 'default', text: 'Перейти в канал'}, {id: 'cancel', type: 'cancel', text: 'Отмена'}]
+                title: 'Подписка', message: 'Подпишись на канал @bananagiftcaser',
+                buttons: [{id: 'open', type: 'default', text: 'Перейти'}, {id: 'cancel', type: 'cancel', text: 'Отмена'}]
             }, function(result) {
                 if (result === 'open') {
                     tg.openTelegramLink('https://t.me/bananagiftcaser');
                     setTimeout(() => {
                         tg.showPopup({
-                            title: 'Проверка', message: 'Ты подписался на канал?',
-                            buttons: [{id: 'yes', type: 'default', text: 'Да, подписался'}, {id: 'no', type: 'cancel', text: 'Нет'}]
-                        }, function(res) { if (res === 'yes') { startSpin(); } });
+                            title: 'Проверка', message: 'Ты подписался?',
+                            buttons: [{id: 'yes', type: 'default', text: 'Да'}, {id: 'no', type: 'cancel', text: 'Нет'}]
+                        }, function(res) { if (res === 'yes') { startMulticastSpin(); } });
                     }, 3000);
                 }
             });
         }
 
-        let liveTrack = document.getElementById('live-track');
-        let animationId;
-        let offsetX = 0;
-        let speed = 0.5; 
-
-        function initLiveTrack() {
-            liveTrack.innerHTML = '';
-            let source;
-            if (currentCaseType === 'sub') source = subCasePrizes;
-            else if (currentCaseType === 'ring') source = ringCasePrizes;
-            else source = nftPrizes;
-
-            for (let i = 0; i < 30; i++) {
-                liveTrack.innerHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
-            }
-        }
-
-        function animateLiveTrack() {
-            if (isSpinning) return;
-            offsetX -= speed;
-            if (Math.abs(offsetX) > (liveTrack.scrollWidth / 2)) offsetX = 0;
-            liveTrack.style.transform = `translate(${offsetX}px, -50%)`;
-            animationId = requestAnimationFrame(animateLiveTrack);
-        }
-
-        function startLiveTrack() { isSpinning = false; cancelAnimationFrame(animationId); animateLiveTrack(); }
-        function stopLiveTrack() { isSpinning = true; cancelAnimationFrame(animationId); }
-
-        function startSpin() {
-            if (isSpinning) return; 
-            isSpinning = true; updateInsideCaseButton(); stopLiveTrack(); playSpinSound();
-            let winItem;
+        // --- МЕХАНИКА МУЛЬТИКАСТА ---
+        function getRandomPrize() {
+            let source = currentCaseType === 'sub' ? subCasePrizes : (currentCaseType === 'ring' ? ringCasePrizes : nftPrizes);
+            const rand = Math.random() * 100; let cumulative = 0;
+            let winItem = source[source.length - 1];
+            for (let p of source) { cumulative += p.chance; if (rand <= cumulative) { winItem = p; break; } }
             
-            if (currentCaseType === 'nft') {
-                const rand = Math.random() * 100; let cumulative = 0;
-                winItem = nftPrizes[nftPrizes.length - 1];
-                for (let p of nftPrizes) { cumulative += p.chance; if (rand <= cumulative) { winItem = p; break; } }
-                winItem.isNft = true;
-                winItem.isLocked = true; 
-                winItem.uniqueId = Date.now() + Math.random(); 
-            } else if (currentCaseType === 'sub') {
-                const rand = Math.random() * 100;
-                if (rand < 90) {
-                    winItem = { name: `+${Math.floor(Math.random() * 6) + 5} Stars`, isNft: false, amount: 5, img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png' };
-                } else {
-                    const randNft = Math.random() * 100; let cumulative = 0;
-                    winItem = subCasePrizes[subCasePrizes.length - 1];
-                    const totalNftChance = subCasePrizes.reduce((sum, p) => sum + p.chance, 0);
-                    for (let p of subCasePrizes) { cumulative += (p.chance / totalNftChance) * 100; if (randNft <= cumulative) { winItem = p; break; } }
-                    winItem.isNft = true;
-                    winItem.isLocked = true; 
-                    winItem.uniqueId = Date.now() + Math.random();
-                }
-            } else if (currentCaseType === 'ring') {
-                const rand = Math.random() * 100; let cumulative = 0;
-                winItem = ringCasePrizes[ringCasePrizes.length - 1];
-                for (let p of ringCasePrizes) { cumulative += p.chance; if (rand <= cumulative) { winItem = p; break; } }
-                
-                if (!winItem.isStar) {
-                    winItem.isNft = true;
-                    winItem.uniqueId = Date.now() + Math.random();
-                    winItem.isLocked = false; 
-                } else {
-                    winItem.isNft = false;
-                    winItem.amount = winItem.price; 
-                }
-            }
-
-            currentWinItem = winItem;
-            liveTrack.innerHTML = '';
-            let sourceForTrack;
-            if (currentCaseType === 'sub') sourceForTrack = subCasePrizes;
-            else if (currentCaseType === 'ring') sourceForTrack = ringCasePrizes;
-            else sourceForTrack = nftPrizes;
-
-            for (let i = 0; i < 70; i++) { liveTrack.innerHTML += `<div class="live-item"><img src="${sourceForTrack[Math.floor(Math.random() * sourceForTrack.length)].img}"></div>`; }
+            if (winItem.isStar) winItem.isNft = false;
+            else winItem.isNft = true;
             
-            const items = liveTrack.children;
-            items[60].innerHTML = `<img src="${winItem.img}">`;
-
-            liveTrack.style.transition = 'none';
-            liveTrack.style.transform = `translate(0px, -50%)`;
-
-            setTimeout(() => {
-                const itemWidth = items[0].getBoundingClientRect().width + 20;
-                const targetOffset = -(60 * itemWidth) + (window.innerWidth / 2) - (itemWidth / 2);
-                
-                liveTrack.style.transition = 'transform 10s cubic-bezier(0.1, 0.7, 0.1, 1)';
-                liveTrack.style.transform = `translate(${targetOffset}px, -50%)`;
-                
-                skipTimeout = setTimeout(() => { finishSpin(winItem); }, 10100);
-            }, 50);
+            winItem.isLocked = (currentCaseType === 'nft' || (currentCaseType === 'sub' && winItem.isNft));
+            winItem.uniqueId = Date.now() + Math.random();
+            return winItem;
         }
 
-        function finishSpin(winItem) {
-            if (!isSpinning) return; 
-            clearTimeout(skipTimeout); stopSpinSound(); playWinSound();
-            liveTrack.style.transition = 'none'; liveTrack.style.transform = window.getComputedStyle(liveTrack).transform;
+        function getMulticastCount() {
+            const rand = Math.random() * 100;
+            if (rand < multicastChances.x5) return 5;
+            if (rand < multicastChances.x5 + multicastChances.x4) return 4;
+            if (rand < multicastChances.x5 + multicastChances.x4 + multicastChances.x3) return 3;
+            if (rand < multicastChances.x5 + multicastChances.x4 + multicastChances.x3 + multicastChances.x2) return 2;
+            return 1;
+        }
 
-            if (currentCaseType === 'nft') { 
-                hasNft = true; wonNftData = winItem; 
-                myInventory.push(winItem); totalInventoryValue += winItem.price;
-                renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
-            } else if (currentCaseType === 'sub') {
-                if (!winItem.isNft) { bonusBalance += winItem.amount; updateUI(); startTimer(); } 
-                else { 
-                    hasNft = true; wonNftData = winItem; 
-                    myInventory.push(winItem); totalInventoryValue += winItem.price;
-                    renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
-                }
-            } else if (currentCaseType === 'ring') {
-                if (winItem.isStar) {
-                    bonusBalance += winItem.amount;
-                    updateUI();
-                } else {
-                    myInventory.push(winItem); totalInventoryValue += winItem.price;
-                    renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
-                }
+        function startMulticastSpin() {
+            if (isAnimating) return;
+            isAnimating = true;
+            updateInsideCaseButton();
+            playSpinSound();
+
+            let count = getMulticastCount();
+            currentWinItems = [];
+            
+            document.getElementById('row-1').style.opacity = 1;
+            document.getElementById('row-1').style.pointerEvents = 'auto';
+            document.getElementById('row-2').style.opacity = 0;
+            document.getElementById('row-2').style.pointerEvents = 'none';
+            document.getElementById('row-3').style.opacity = 0;
+            document.getElementById('row-3').style.pointerEvents = 'none';
+            document.getElementById('multicast-text').style.display = 'none';
+
+            document.getElementById('track-1').innerHTML = '';
+            document.getElementById('track-2').innerHTML = '';
+            document.getElementById('track-3').innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                currentWinItems.push(getRandomPrize());
             }
-            isSpinning = false; updateInsideCaseButton(); showWinModal(winItem);
-            setTimeout(startLiveTrack, 1000); 
+
+            function spinRow(index) {
+                if (index >= count) {
+                    finishMulticast();
+                    return;
+                }
+
+                let track = document.getElementById(`track-${index + 1}`);
+                let rowDiv = document.getElementById(`row-${index + 1}`);
+                rowDiv.style.opacity = 1;
+
+                let source = currentCaseType === 'sub' ? subCasePrizes : (currentCaseType === 'ring' ? ringCasePrizes : nftPrizes);
+                for (let i = 0; i < 60; i++) { 
+                    track.innerHTML += `<div class="live-item"><img src="${source[Math.floor(Math.random() * source.length)].img}"></div>`; 
+                }
+                
+                const items = track.children;
+                items[50].innerHTML = `<img src="${currentWinItems[index].img}">`;
+
+                track.style.transition = 'none';
+                track.style.transform = `translate(0px, -50%)`;
+
+                setTimeout(() => {
+                    const itemWidth = items[0].getBoundingClientRect().width + 10;
+                    const targetOffset = -(50 * itemWidth) + (window.innerWidth / 2) - (itemWidth / 2);
+                    
+                    track.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                    track.style.transform = `translate(${targetOffset}px, -50%)`;
+
+                    let timeout = setTimeout(() => {
+                        if (index === 0 && count > 1) {
+                            let mcText = document.getElementById('multicast-text');
+                            mcText.innerText = `MULTICAST x${count}`;
+                            mcText.style.display = 'block';
+                            playWinSound();
+                        }
+                        
+                        spinRow(index + 1);
+                    }, 5100); 
+                    skipTimeouts.push(timeout);
+                }, 50);
+            }
+
+            spinRow(0);
         }
 
-        function skipAnimation() { if (currentWinItem) finishSpin(currentWinItem); }
-        
+        function finishMulticast() {
+            document.getElementById('multicast-text').style.display = 'none';
+            
+            currentWinItems.forEach(item => {
+                if (item.isNft) {
+                    myInventory.push(item);
+                    totalInventoryValue += item.price;
+                } else {
+                    bonusBalance += item.amount || item.price;
+                }
+            });
+            updateUI();
+            renderInventory();
+            document.getElementById('inv-price-val').innerText = totalInventoryValue;
+            
+            if (currentWinItems.length > 0) {
+                showWinModal(currentWinItems[currentWinItems.length - 1]);
+            }
+            
+            isAnimating = false;
+            updateInsideCaseButton();
+            setTimeout(() => playWinSound(), 500);
+        }
+
+        function skipAllAnimations() {
+            skipTimeouts.forEach(t => clearTimeout(t));
+            skipTimeouts = [];
+            finishMulticast();
+        }
+
+        // --- ВСПОМОГАТЕЛЬНЫЕ ---
         function openPrizes() {
             const container = document.getElementById('prizes-grid-container');
             container.innerHTML = '';
-            let source;
-            if (currentCaseType === 'sub') source = subCasePrizes;
-            else if (currentCaseType === 'ring') source = ringCasePrizes;
-            else source = nftPrizes;
-
+            let source = currentCaseType === 'sub' ? subCasePrizes : (currentCaseType === 'ring' ? ringCasePrizes : nftPrizes);
             const sortedPrizes = [...source].sort((a, b) => b.price - a.price);
             sortedPrizes.forEach(prize => {
                 container.innerHTML += `<div class="prize-item"><img src="${prize.img}"><div style="font-size:13px; margin-bottom:3px; font-weight:bold;">${prize.name}</div><div class="prize-price">${prize.price} ⭐</div></div>`;
@@ -1083,13 +983,10 @@
         function showNftConditions() {
             const modal = document.getElementById('win-modal');
             document.getElementById('win-image').src = wonNftData.img; document.getElementById('win-image').style.display = 'block';
-            document.getElementById('win-title').innerText = '';
-            document.getElementById('win-item-name').innerText = wonNftData.name;
+            document.getElementById('win-title').innerText = ''; document.getElementById('win-item-name').innerText = wonNftData.name;
             document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${wonNftData.price}</span>`;
-            document.getElementById('win-desc').innerText = 'Ты уже выбил этот кейс.';
-            document.getElementById('ref-block').style.display = 'block';
-            document.getElementById('win-ref-count').innerText = myReferrals;
-            document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
+            document.getElementById('win-desc').innerText = 'Ты уже выбил этот кейс.'; document.getElementById('ref-block').style.display = 'block';
+            document.getElementById('win-ref-count').innerText = myReferrals; document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
             modal.style.display = 'flex';
         }
 
@@ -1097,20 +994,11 @@
             const modal = document.getElementById('win-modal');
             document.getElementById('win-image').src = item.img; document.getElementById('win-image').style.display = 'block';
             document.getElementById('win-item-name').innerText = item.name;
-            
             if (item.isNft) {
                 document.getElementById('win-title').innerText = 'Вы выиграли NFT!';
                 document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
-                document.getElementById('win-desc').innerText = ''; 
-                
-                if (item.isLocked) {
-                    document.getElementById('ref-block').style.display = 'block';
-                } else {
-                    document.getElementById('ref-block').style.display = 'none';
-                }
-                
-                document.getElementById('win-ref-count').innerText = myReferrals;
-                document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
+                document.getElementById('win-desc').innerText = ''; document.getElementById('ref-block').style.display = item.isLocked ? 'block' : 'none';
+                document.getElementById('win-ref-count').innerText = myReferrals; document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
             } else {
                 document.getElementById('win-title').innerText = 'Вы выиграли!';
                 document.getElementById('win-item-price').innerHTML = ''; document.getElementById('win-desc').innerText = 'Зачислено на твой баланс.'; document.getElementById('ref-block').style.display = 'none';
@@ -1123,23 +1011,13 @@
             document.getElementById('win-image').src = item.img; document.getElementById('win-image').style.display = 'block';
             document.getElementById('win-item-name').innerText = item.name;
             document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
-            document.getElementById('ref-block').style.display = 'none';
-            document.getElementById('win-desc').innerText = '';
-
-            if (isSuccess) {
-                document.getElementById('win-title').innerText = 'УСПЕХ!';
-                document.getElementById('win-title').style.color = 'var(--green)';
-            } else {
-                document.getElementById('win-title').innerText = 'НЕУДАЧА! Предмет сгорел';
-                document.getElementById('win-title').style.color = 'var(--red)';
-            }
+            document.getElementById('ref-block').style.display = 'none'; document.getElementById('win-desc').innerText = '';
+            if (isSuccess) { document.getElementById('win-title').innerText = 'УСПЕХ!'; document.getElementById('win-title').style.color = 'var(--green)'; } 
+            else { document.getElementById('win-title').innerText = 'НЕУДАЧА!'; document.getElementById('win-title').style.color = 'var(--red)'; }
             modal.style.display = 'flex';
         }
 
-        function closeWinModal() { 
-            document.getElementById('win-modal').style.display = 'none'; 
-            document.getElementById('win-title').style.color = 'var(--text-muted)'; 
-        }
+        function closeWinModal() { document.getElementById('win-modal').style.display = 'none'; document.getElementById('win-title').style.color = 'var(--text-muted)'; }
         function updateUI() { document.getElementById('user-balance').innerText = donateBalance + bonusBalance; }
         updateUI();
     </script>
