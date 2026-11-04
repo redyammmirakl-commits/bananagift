@@ -48,12 +48,12 @@
         .screen.active { display: flex; }
 
         .case-list { padding: 15px; }
-        .case-card { background: var(--bg-card); border-radius: var(--radius); padding: 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; cursor: pointer; }
-        .case-header { display: flex; align-items: center; gap: 15px; }
-        .case-icon { font-size: 40px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 18px; }
-        .case-icon img { width: 40px; height: 40px; object-fit: contain;}
+        .case-card { background: var(--bg-card); border-radius: var(--radius); padding: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; min-height: 80px; }
+        .case-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 15px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; font-size: 24px; overflow: hidden;}
+        .case-icon img { width: 100%; height: 100%; object-fit: cover;}
+        .case-info h3 { margin: 0 0 5px 0; font-size: 18px; }
+        .case-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
 
-        /* АПГРЕЙДЕР */
         .top-nav-case { display: flex; justify-content: space-between; padding: 15px; z-index: 10; }
         .icon-btn { background: var(--bg-card); border: none; color: white; padding: 12px 20px; border-radius: 15px; font-weight: bold; font-size: 14px; cursor: pointer;}
         .upgrader-container { padding: 0 15px 15px 15px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;}
@@ -107,7 +107,7 @@
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
         .select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; overflow-y: auto; padding-bottom: 20px;}
         .select-item { background: var(--bg-card); padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; border: 2px solid transparent;}
-        .select-item:active { border-color: var(--accent); }
+        .select-item.selected { border-color: var(--accent); }
         .select-item img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px;}
         .close-modal-btn { background: var(--bg-card); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: auto; cursor: pointer;}
 
@@ -204,6 +204,19 @@
             transition: 0.2s;
         }
         .btn-sell:active { background: #333; }
+
+        .ref-condition-box {
+            background: var(--bg-panel); padding: 15px; border-radius: 15px; margin-top: 10px; width: 100%; box-sizing: border-box;
+        }
+        .ref-condition-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: bold; }
+        .ref-condition-row span { color: var(--text-muted); }
+        .ref-condition-row .val { color: var(--text-main); }
+        .ref-condition-row .val.done { color: var(--green); }
+        
+        .btn-topup-mini {
+            background: var(--accent); color: white; border: none; padding: 10px; border-radius: 10px;
+            font-weight: bold; font-size: 14px; width: 100%; cursor: pointer; margin-top: 5px;
+        }
         
         .nav-bar { display: flex; justify-content: space-around; background-color: var(--bg-card); padding: 15px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 10; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 13px; cursor: pointer; font-weight: 600; padding: 5px 15px; border-radius: 20px; transition: 0.2s;}
@@ -217,6 +230,19 @@
             border-radius: 15px; color: white; font-size: 16px; margin-bottom: 10px; box-sizing: border-box;
         }
         .promo-input:focus { outline: none; border-color: var(--accent); }
+
+        /* КОНТРАКТЫ */
+        .contracts-container { padding: 15px; }
+        .contract-slots { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;}
+        .contract-slot { 
+            width: 60px; height: 60px; background: var(--bg-panel); border-radius: 15px; 
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            border: 2px dashed #444; font-size: 24px; color: #444;
+        }
+        .contract-slot img { width: 80%; height: 80%; object-fit: contain;}
+        .contract-slot.filled { border: 2px solid var(--accent); background: var(--bg-card);}
+        .btn-contract { background: linear-gradient(90deg, #d946ef, #8a2be2); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-contract:disabled { background: #333; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -231,7 +257,7 @@
         </button>
         <div class="header-right">
             <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
-            <button class="top-up-btn glass-effect" onclick="tg.showAlert('Скоро!'); playClick()">Пополнить</button>
+            <button class="top-up-btn glass-effect" onclick="fakeTopUp(); playClick()">Пополнить</button>
         </div>
     </div>
 
@@ -241,25 +267,59 @@
             <h2 style="margin-top:0;">Игры</h2>
             
             <div class="case-card glass-effect" onclick="switchScreen('free-cases'); playClick()">
-                <div class="case-header">
-                    <div class="case-icon">🎁</div>
-                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатно</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">2 кейса доступно</p></div>
+                <div class="case-icon">🎁</div>
+                <div class="case-info">
+                    <h3>Бесплатно</h3>
+                    <p>2 кейса доступно</p>
                 </div>
             </div>
 
             <div class="case-card glass-effect" onclick="switchScreen('paid-cases'); playClick()">
-                <div class="case-header">
-                    <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:50px; height:50px; border-radius:12px;"></div>
-                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Кейсы</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Платные кейсы</p></div>
+                <div class="case-icon"><img src="IMG_8170.jpeg"></div>
+                <div class="case-info">
+                    <h3>Кейсы</h3>
+                    <p>Платные кейсы</p>
+                </div>
+            </div>
+
+            <div class="case-card glass-effect" onclick="switchScreen('contracts'); playClick()">
+                <div class="case-icon" style="background:none; font-size:30px;">📜</div>
+                <div class="case-info">
+                    <h3>Контракты</h3>
+                    <p>Обменяй 5 NFT на 1</p>
                 </div>
             </div>
 
             <div class="case-card glass-effect" onclick="switchScreen('upgrader'); playClick()">
-                <div class="case-header">
-                    <div class="case-icon">🔄</div>
-                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Апгрейдер</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Улучши свой инвентарь</p></div>
+                <div class="case-icon">🔄</div>
+                <div class="case-info">
+                    <h3>Апгрейдер</h3>
+                    <p>Улучши свой инвентарь</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН КОНТРАКТОВ -->
+    <div id="screen-contracts" class="screen">
+        <div class="top-nav-case">
+            <button class="icon-btn glass-effect" onclick="switchScreen('games'); playClick()">← Назад</button>
+        </div>
+        <div class="contracts-container">
+            <h2 style="text-align:center; margin-top:0;">Контракты</h2>
+            <p style="text-align:center; color:var(--text-muted); font-size:14px; margin-bottom:20px;">
+                Выбери до 5 NFT, и получи 1 предмет дороже (или потеряй всё).
+            </p>
+
+            <div class="contract-slots" id="contract-slots-container">
+                <div class="contract-slot" id="slot-1" onclick="openSelectForContract(0)">+</div>
+                <div class="contract-slot" id="slot-2" onclick="openSelectForContract(1)">+</div>
+                <div class="contract-slot" id="slot-3" onclick="openSelectForContract(2)">+</div>
+                <div class="contract-slot" id="slot-4" onclick="openSelectForContract(3)">+</div>
+                <div class="contract-slot" id="slot-5" onclick="openSelectForContract(4)">+</div>
+            </div>
+
+            <button class="btn-contract glass-effect" id="btn-start-contract" onclick="startContract(); playClick()" disabled>Заключить контракт</button>
         </div>
     </div>
 
@@ -269,22 +329,18 @@
             <h2 style="margin-top:0;">Кейсы</h2>
             
             <div class="case-card glass-effect" onclick="openPaidCase('ring'); playClick()">
-                <div class="case-header">
-                    <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
-                    <div>
-                        <h3 style="margin:0 0 5px 0; font-size: 18px;">Ring</h3>
-                        <p style="margin:0; font-size:13px; color:var(--text-muted);">Цена: 149 ⭐</p>
-                    </div>
+                <div class="case-icon"><img src="Без названия123_20261104170020.jpeg"></div>
+                <div class="case-info">
+                    <h3>Ring</h3>
+                    <p>Цена: 149 ⭐</p>
                 </div>
             </div>
 
             <div class="case-card glass-effect" onclick="openPaidCase('multicast'); playClick()">
-                <div class="case-header">
-                    <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
-                    <div>
-                        <h3 style="margin:0 0 5px 0; font-size: 18px;">Multicast Case</h3>
-                        <p style="margin:0; font-size:13px; color:var(--text-muted);">Цена: 322 ⭐</p>
-                    </div>
+                <div class="case-icon"><img src="IMG_8170.jpeg"></div>
+                <div class="case-info">
+                    <h3>Multicast Case</h3>
+                    <p>Цена: 322 ⭐</p>
                 </div>
             </div>
 
@@ -296,16 +352,19 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Бонусы</h2>
             
-            <div class="case-card glass-effect">
-                <div class="case-header" style="margin-bottom: 15px;">
-                    <div class="case-icon">📢</div>
-                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Подписка на канал</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Получи 1 звезду</p></div>
+            <div class="case-card glass-effect" style="flex-direction: column; align-items: stretch; gap: 15px;">
+                <div style="display:flex; align-items:center; gap: 15px;">
+                    <div class="case-icon" style="background:none; font-size:30px;">📢</div>
+                    <div class="case-info">
+                        <h3>Подписка на канал</h3>
+                        <p>Получи 1 звезду</p>
+                    </div>
                 </div>
                 <button class="btn-secondary glass-effect" onclick="checkBonusSubscription(); playClick()" style="background: var(--accent); color: white; border: none;">Выполнить</button>
             </div>
 
-            <div class="case-card glass-effect" style="margin-top: 30px;">
-                <h3 style="margin:0 0 15px 0; font-size: 18px;">Активировать промокод</h3>
+            <div class="case-card glass-effect" style="flex-direction: column; align-items: stretch; gap: 15px; margin-top: 30px;">
+                <h3 style="margin:0 0 5px 0; font-size: 18px;">Активировать промокод</h3>
                 <input type="text" id="promo-input" class="promo-input" placeholder="Введите промокод...">
                 <button class="btn-secondary glass-effect" onclick="activatePromo(); playClick()" style="background: var(--accent); color: white; border: none;">Активировать</button>
             </div>
@@ -353,10 +412,12 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Бесплатные кейсы</h2>
             <div class="case-card glass-effect" onclick="openInsideCase('sub'); playClick()">
-                <div class="case-header"><div class="case-icon">⭐</div><div><h3 style="margin:0 0 5px 0; font-size: 18px;">За подписку</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Раз в 24 часа</p></div></div>
+                <div class="case-icon">⭐</div>
+                <div class="case-info"><h3>За подписку</h3><p>Раз в 24 часа</p></div>
             </div>
             <div class="case-card glass-effect" onclick="openInsideCase('nft'); playClick()">
-                <div class="case-header"><div class="case-icon">🎁</div><div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатный NFT</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">1 раз (5 друзей для вывода)</p></div></div>
+                <div class="case-icon">🎁</div>
+                <div class="case-info"><h3>Бесплатный NFT</h3><p>1 раз (2 друга + 100⭐)</p></div>
             </div>
             <button class="btn-roll-big glass-effect" onclick="switchScreen('games'); playClick()" style="background:var(--bg-card); margin-top:10px; font-size: 16px;">Назад</button>
         </div>
@@ -369,7 +430,6 @@
         </div>
         
         <div class="live-roulette-area" id="roulette-container">
-            <!-- СЛОТЫ -->
             <div id="slots-container">
                 <div class="slots-title">MULTICAST</div>
                 <div class="slots-machine">
@@ -379,11 +439,7 @@
                 </div>
                 <div class="slots-result-text" id="slots-result-text">Ожидание...</div>
             </div>
-
-            <!-- Текст мультикаста -->
             <div id="multicast-text">MULTICAST x2</div>
-
-            <!-- Ленты кейса (динамические) -->
             <div id="roulette-rows-container" style="width:100%; display:flex; flex-direction:column; gap:10px;"></div>
         </div>
 
@@ -437,7 +493,6 @@
 
     <div id="win-modal">
         <div class="win-box">
-            <!-- Одиночный выигрыш -->
             <div id="single-win-container">
                 <div class="win-image-container">
                     <img id="win-image" class="win-image" src="" style="display:none;">
@@ -447,30 +502,35 @@
                 <div id="win-item-price" class="win-item-price"><span>⭐</span> <span id="win-price-val">0</span></div>
             </div>
 
-            <!-- Мультикаст (Список) -->
             <div id="multi-win-container" style="display:none; width:100%;">
                 <div id="multi-win-title" style="font-size: 16px; color: var(--purple); font-weight:bold; margin-bottom: 15px; text-transform:uppercase;">Мультикаст!</div>
-                <div class="multicast-list" id="multicast-list-container">
-                    <!-- Заполняется через JS -->
-                </div>
+                <div class="multicast-list" id="multicast-list-container"></div>
             </div>
 
             <div id="ref-block" style="display:none; background:var(--bg-panel); padding:15px; border-radius:15px; margin-top:5px; width:100%; box-sizing:border-box;">
                 <p style="margin:0 0 5px 0; font-size:13px; color:var(--red); font-weight:bold;">🔒 Заблокировано!</p>
-                <p style="margin:0 0 10px 0; font-size:12px; color:#ccc;">Приведи 5 друзей, чтобы вывести NFT.</p>
-                <div class="progress-bar" style="height:8px;"><div class="progress-fill" id="win-progress" style="width: 0%;"></div></div>
-                <p style="font-size:12px; margin:0; font-weight:bold;"><span id="win-ref-count">0</span> / 5</p>
+                <p style="margin:0 0 10px 0; font-size:12px; color:#ccc;">Выполни условия, чтобы забрать:</p>
+                
+                <div class="ref-condition-row">
+                    <span>Приведи друзей:</span>
+                    <span class="val" id="win-ref-count">0 / 2</span>
+                </div>
+                <div class="ref-condition-row">
+                    <span>Пополни на 100 ⭐:</span>
+                    <span class="val" id="win-topup-status">Нет</span>
+                </div>
+
+                <button class="btn-topup-mini" onclick="fakeTopUp(100); playClick()">Пополнить на 100 ⭐</button>
             </div>
 
             <p id="win-desc" style="font-size:13px; color:var(--text-muted); margin-top:15px;"></p>
-            
             <button class="btn-action glass-effect" id="win-btn" onclick="closeWinModal(); playClick()" style="margin-top:20px; background:var(--accent); color:white; border:none; padding:16px; border-radius:15px; font-weight:bold; width:100%; font-size:16px; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
     <div class="nav-bar">
         <div class="nav-item glass-effect active" onclick="switchScreen('games'); playClick()">Игры</div>
-        <div class="nav-item glass-effect" onclick="playClick()">Конкурсы</div>
+        <div class="nav-item glass-effect" onclick="switchScreen('contracts'); playClick()">Контракты</div>
         <div class="nav-item glass-effect" onclick="switchScreen('bonuses'); playClick()">Бонусы</div>
         <div class="nav-item glass-effect" onclick="playClick()">Турнир</div>
         <div class="nav-item glass-effect" onclick="switchScreen('profile'); playClick()">Профиль</div>
@@ -494,7 +554,7 @@
         function playWinSound() { soundWin.currentTime = 0; soundWin.play().catch(e => {}); }
         function playClick() { soundClick.currentTime = 0; soundClick.volume = 0.5; soundClick.play().catch(e => {}); }
 
-        let myReferrals = 0; const neededReferrals = 5;
+        let myReferrals = 0; const neededReferrals = 2; // Теперь нужно 2 друга
         let hasNft = false; let wonNftData = null; 
         let donateBalance = 0; let bonusBalance = 0;   
         let currentCaseType = 'nft'; 
@@ -510,7 +570,12 @@
         let selectedMyItem = null; let selectedTargetItem = null;
         let starsAddedToUpgrade = 0;
 
-        // --- БАЗА ПРИЗОВ С ОБНОВЛЕННЫМИ ЦЕНАМИ ---
+        let contractItems = [null, null, null, null, null];
+        let selectingContractSlotIndex = -1;
+
+        // Флаг, пополнил ли человек баланс на 100 звезд (для разблокировки)
+        let hasToppedUp100 = false;
+
         const allNftPrizes = [
             { id: 'signet', name: 'Signet Ring', img: 'Без названия116_20261104163406.png', price: 3631 },
             { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', price: 27144 },
@@ -536,7 +601,6 @@
 
         const subCasePrizes = allNftPrizes.filter(p => p.id !== 'cat');
 
-        // Призы для кейса Ring (ОБНОВЛЕНО: без дорогих и без Bunny Muffin)
         const ringCasePrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 3631 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1180 },
@@ -553,15 +617,11 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 12, price: 5, isStar: true }
         ];
 
-        // Призы для кейса Multicast (СИЛЬНО УРЕЗАННЫЕ ШАНСЫ НА ДОРОГИЕ NFT)
         const multicastPrizes = [
-            // Дорогие (очень редкие)
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.05, price: 3631 },
             { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.01, price: 27144 },
             { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 0.05, price: 12801 },
             { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 0.1, price: 7806 },
-            
-            // Средние
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1180 },
             { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1, price: 817 },
             { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 1.5, price: 817 },
@@ -569,22 +629,54 @@
             { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 2, price: 635 },
             { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 2.5, price: 635 },
             { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 2.5, price: 635 },
-            
-            // Дешевые
             { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 4, price: 545 },
             { name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', chance: 4, price: 545 },
             { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 5, price: 454 },
             { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 5, price: 454 },
             { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 5, price: 454 },
-
-            // Звезды (основная масса)
             { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 25, isStar: true },
             { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 20, price: 15, isStar: true },
             { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 10, isStar: true },
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
-        // --- БОНУСЫ ---
+        // Имитация пополнения
+        function fakeTopUp(amount = 100) {
+            donateBalance += amount;
+            if (amount >= 100) hasToppedUp100 = true;
+            updateUI();
+            updateRefUI(); // Обновляем окно выигрыша, если оно открыто
+            tg.showAlert(`Баланс пополнен на ${amount} ⭐`);
+        }
+
+        function updateRefUI() {
+            const refCountEl = document.getElementById('win-ref-count');
+            const topupStatusEl = document.getElementById('win-topup-status');
+            
+            if (refCountEl) {
+                refCountEl.innerText = `${myReferrals} / ${neededReferrals}`;
+                if (myReferrals >= neededReferrals) refCountEl.classList.add('done');
+                else refCountEl.classList.remove('done');
+            }
+
+            if (topupStatusEl) {
+                topupStatusEl.innerText = hasToppedUp100 ? 'Да' : 'Нет';
+                if (hasToppedUp100) topupStatusEl.classList.add('done');
+                else topupStatusEl.classList.remove('done');
+            }
+
+            // Если все условия выполнены, меняем замок на "Забрать"
+            if (myReferrals >= neededReferrals && hasToppedUp100 && wonNftData) {
+                // Разблокируем предмет в инвентаре
+                const itemInInv = myInventory.find(i => i.uniqueId === wonNftData.uniqueId);
+                if (itemInInv && itemInInv.isLocked) {
+                    itemInInv.isLocked = false;
+                    renderInventory();
+                    tg.showAlert("Условия выполнены! NFT разблокирован.");
+                }
+            }
+        }
+
         function checkBonusSubscription() {
             tg.openTelegramLink('https://t.me/bananagiftcaser');
             setTimeout(() => {
@@ -607,7 +699,6 @@
             else { tg.showAlert("Неверный промокод."); }
         }
 
-        // --- ПРОДАЖА ---
         function sellNft(index) {
             const item = myInventory[index];
             if (item.isLocked) { tg.showAlert("Предмет заблокирован!"); return; }
@@ -625,7 +716,145 @@
             });
         }
 
-        // --- АПГРЕЙД ЛОГИКА ---
+        // --- КОНТРАКТЫ ---
+        function openSelectForContract(slotIndex) {
+            selectingContractSlotIndex = slotIndex;
+            const container = document.getElementById('select-grid-container');
+            const starsBtn = document.getElementById('select-stars-btn');
+            container.innerHTML = '';
+            const modal = document.getElementById('modal-select');
+            
+            document.getElementById('modal-select-title').innerText = `Выберите NFT для слота ${slotIndex + 1}`;
+            starsBtn.style.display = 'none';
+
+            let availableItems = myInventory.filter((item) => {
+                if (item.isLocked) return false;
+                return !contractItems.includes(item.uniqueId);
+            });
+
+            if (availableItems.length === 0) {
+                container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных NFT</p>';
+            } else {
+                availableItems.forEach((prize) => {
+                    const div = document.createElement('div');
+                    div.className = 'select-item';
+                    div.onclick = () => { 
+                        contractItems[slotIndex] = prize.uniqueId;
+                        updateContractUI();
+                        closeSelectModal(); playClick(); 
+                    };
+                    div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
+                    container.appendChild(div);
+                });
+            }
+            modal.classList.add('active');
+        }
+
+        function updateContractUI() {
+            let totalValue = 0;
+            let filledCount = 0;
+
+            for (let i = 0; i < 5; i++) {
+                const slotDiv = document.getElementById(`slot-${i + 1}`);
+                if (contractItems[i]) {
+                    const item = myInventory.find(inv => inv.uniqueId === contractItems[i]);
+                    if (item) {
+                        slotDiv.innerHTML = `<img src="${item.img}">`;
+                        slotDiv.classList.add('filled');
+                        totalValue += item.price;
+                        filledCount++;
+                    }
+                } else {
+                    slotDiv.innerHTML = '+';
+                    slotDiv.classList.remove('filled');
+                }
+            }
+
+            const btn = document.getElementById('btn-start-contract');
+            if (filledCount >= 2) {
+                btn.disabled = false;
+                btn.innerText = `Заключить (Стоимость: ${totalValue} ⭐)`;
+            } else {
+                btn.disabled = true;
+                btn.innerText = 'Нужно минимум 2 NFT';
+            }
+        }
+
+        function startContract() {
+            playSpinSound();
+            
+            let totalValue = 0;
+            let itemsToRemove = [];
+
+            for (let i = 0; i < 5; i++) {
+                if (contractItems[i]) {
+                    const item = myInventory.find(inv => inv.uniqueId === contractItems[i]);
+                    if (item) {
+                        totalValue += item.price;
+                        itemsToRemove.push(item);
+                    }
+                }
+            }
+
+            const isSuccess = Math.random() < 0.5;
+
+            setTimeout(() => {
+                stopSpinSound();
+                
+                myInventory = myInventory.filter(item => !itemsToRemove.includes(item));
+                totalInventoryValue -= totalValue;
+
+                if (isSuccess) {
+                    let availablePrizes = allNftPrizes.filter(p => p.price > totalValue && p.price <= totalValue * 1.5);
+                    if (availablePrizes.length === 0) availablePrizes = allNftPrizes.filter(p => p.price > totalValue);
+                    
+                    let winItem = availablePrizes[Math.floor(Math.random() * availablePrizes.length)];
+                    if (!winItem) winItem = allNftPrizes[allNftPrizes.length - 1];
+
+                    myInventory.push({...winItem, uniqueId: Date.now() + Math.random(), isLocked: false});
+                    totalInventoryValue += winItem.price;
+                    
+                    playWinSound();
+                    showContractResult(true, winItem);
+                } else {
+                    playWinSound();
+                    showContractResult(false, null);
+                }
+
+                contractItems = [null, null, null, null, null];
+                updateContractUI();
+                renderInventory();
+                document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                updateUI();
+
+            }, 2000);
+        }
+
+        function showContractResult(isSuccess, item) {
+            const modal = document.getElementById('win-modal');
+            document.getElementById('single-win-container').style.display = 'block';
+            document.getElementById('multi-win-container').style.display = 'none';
+            document.getElementById('ref-block').style.display = 'none';
+
+            if (isSuccess) {
+                document.getElementById('win-image').src = item.img; document.getElementById('win-image').style.display = 'block';
+                document.getElementById('win-title').innerText = 'КОНТРАКТ ВЫПОЛНЕН!';
+                document.getElementById('win-title').style.color = 'var(--green)';
+                document.getElementById('win-item-name').innerText = item.name;
+                document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
+                document.getElementById('win-desc').innerText = 'Ты получил новый предмет!';
+            } else {
+                document.getElementById('win-image').style.display = 'none';
+                document.getElementById('win-title').innerText = 'КОНТРАКТ ПРОВАЛЕН';
+                document.getElementById('win-title').style.color = 'var(--red)';
+                document.getElementById('win-item-name').innerText = 'Предметы сгорели';
+                document.getElementById('win-item-price').innerHTML = '';
+                document.getElementById('win-desc').innerText = 'Ты потерял все выбранные NFT.';
+            }
+            modal.style.display = 'flex';
+        }
+
+        // --- ОСТАЛЬНОЕ ---
         function openSelectModal(type) {
             const container = document.getElementById('select-grid-container');
             const starsBtn = document.getElementById('select-stars-btn');
@@ -811,7 +1040,6 @@
             });
         }
 
-        // --- КЕЙСЫ ЛОГИКА ---
         function startTimer() {
             starsClaimed = true; timeLeft = 24 * 60 * 60; updateInsideCaseButton();
             if (timerInterval) clearInterval(timerInterval);
@@ -831,6 +1059,7 @@
             document.getElementById('screen-' + screenId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if(screenId === 'games' || screenId === 'inside-case' || screenId === 'upgrader' || screenId === 'paid-cases') document.querySelectorAll('.nav-item')[0].classList.add('active');
+            if(screenId === 'contracts') document.querySelectorAll('.nav-item')[1].classList.add('active');
             if(screenId === 'bonuses') document.querySelectorAll('.nav-item')[2].classList.add('active');
             if(screenId === 'profile') document.querySelectorAll('.nav-item')[4].classList.add('active');
             
@@ -861,7 +1090,7 @@
             btn.classList.remove('skip-btn');
             
             if (currentCaseType === 'nft') {
-                if (hasNft) { btn.innerText = "Мои условия (0/5)"; btn.classList.add('timer-btn'); } else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
+                if (hasNft) { btn.innerText = "Мои условия"; btn.classList.add('timer-btn'); } else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
             } else if (currentCaseType === 'sub') {
                 if (starsClaimed) { btn.classList.add('timer-btn'); } else { btn.innerText = "Крутить"; btn.classList.remove('timer-btn'); }
             } else if (currentCaseType === 'ring') {
@@ -918,7 +1147,6 @@
             });
         }
 
-        // --- СЛОТЫ ---
         function startSlotsGame() {
             if (isAnimating) return;
             isAnimating = true;
@@ -995,7 +1223,6 @@
             }, 100);
         }
 
-        // --- МЕХАНИКА МУЛЬТИКАСТА ---
         function getRandomPrize() {
             let source;
             if (currentCaseType === 'sub') source = subCasePrizes;
@@ -1025,7 +1252,6 @@
 
             currentWinItems = [];
             
-            // Очищаем и создаем нужное количество лент
             const rowsContainer = document.getElementById('roulette-rows-container');
             rowsContainer.innerHTML = '';
             document.getElementById('multicast-text').style.display = 'none';
@@ -1095,7 +1321,6 @@
         function finishMulticast() {
             document.getElementById('multicast-text').style.display = 'none';
             
-            // Начисляем ВСЕ выигранные предметы
             currentWinItems.forEach(item => {
                 if (item.isNft) {
                     myInventory.push(item);
@@ -1108,7 +1333,6 @@
             renderInventory();
             document.getElementById('inv-price-val').innerText = totalInventoryValue;
             
-            // Показываем правильное окно
             if (currentWinItems.length > 1) {
                 showMultiWinModal(currentWinItems);
             } else if (currentWinItems.length === 1) {
@@ -1126,7 +1350,6 @@
             finishMulticast();
         }
 
-        // --- ОКНА ---
         function showMultiWinModal(items) {
             const modal = document.getElementById('win-modal');
             document.getElementById('single-win-container').style.display = 'none';
@@ -1162,8 +1385,16 @@
             if (item.isNft) {
                 document.getElementById('win-title').innerText = 'Вы выиграли NFT!';
                 document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
-                document.getElementById('win-desc').innerText = ''; document.getElementById('ref-block').style.display = item.isLocked ? 'block' : 'none';
-                document.getElementById('win-ref-count').innerText = myReferrals; document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
+                document.getElementById('win-desc').innerText = ''; 
+                
+                // Показываем условия
+                if (item.isLocked) {
+                    document.getElementById('ref-block').style.display = 'block';
+                    updateRefUI();
+                } else {
+                    document.getElementById('ref-block').style.display = 'none';
+                }
+                
             } else {
                 document.getElementById('win-title').innerText = 'Вы выиграли!';
                 document.getElementById('win-item-price').innerHTML = ''; document.getElementById('win-desc').innerText = 'Зачислено на твой баланс.'; document.getElementById('ref-block').style.display = 'none';
@@ -1193,8 +1424,11 @@
             document.getElementById('win-image').src = wonNftData.img; document.getElementById('win-image').style.display = 'block';
             document.getElementById('win-title').innerText = ''; document.getElementById('win-item-name').innerText = wonNftData.name;
             document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${wonNftData.price}</span>`;
-            document.getElementById('win-desc').innerText = 'Ты уже выбил этот кейс.'; document.getElementById('ref-block').style.display = 'block';
-            document.getElementById('win-ref-count').innerText = myReferrals; document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
+            document.getElementById('win-desc').innerText = 'Ты уже выбил этот кейс.'; 
+            
+            document.getElementById('ref-block').style.display = 'block';
+            updateRefUI();
+            
             modal.style.display = 'flex';
         }
 
