@@ -51,7 +51,6 @@
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #d946ef; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px #d946ef; }
         
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
-        /* Убрал жесткую ширину, чтобы браузер сам считал */
         .live-item { width: 100px; height: 100px; margin: 0 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
 
@@ -66,9 +65,11 @@
             background: linear-gradient(90deg, #d946ef, #8a2be2); color: white; border: none; 
             padding: 18px; border-radius: 15px; font-weight: bold; font-size: 18px; width: 100%; cursor: pointer;
             box-shadow: 0 4px 15px rgba(138,43,226,0.5); text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.2s;
         }
         .btn-roll-big:active { transform: scale(0.98); }
         .btn-roll-big.timer-btn { background: #333; cursor: not-allowed; color: var(--text-muted); box-shadow: none; }
+        .btn-roll-big.skip-btn { background: #444; box-shadow: none; font-size: 16px;}
 
         #prizes-modal {
             display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 70%;
@@ -246,6 +247,11 @@
         let timerInterval = null;
         let timeLeft = 24 * 60 * 60; 
 
+        // ФЛАГИ ДЛЯ ЗАЩИТЫ ОТ СПАМА
+        let isSpinning = false; // Идет ли сейчас анимация
+        let currentWinItem = null; // Какой приз выпал
+        let skipTimeout = null; // Таймер для анимации
+
         function startTimer() {
             starsClaimed = true;
             timeLeft = 24 * 60 * 60; 
@@ -263,7 +269,7 @@
                     let mStr = m < 10 ? "0" + m : m;
                     let sStr = s < 10 ? "0" + s : s;
                     
-                    if(currentCaseType === 'sub') {
+                    if(currentCaseType === 'sub' && !isSpinning) {
                         document.getElementById('btn-roll-inside').innerText = `⏳ ${hStr}:${mStr}:${sStr}`;
                     }
                 } else {
@@ -290,7 +296,6 @@
         let animationId;
         let offsetX = 0;
         let speed = 0.5; 
-        let isSpinning = false;
 
         function initLiveTrack() {
             liveTrack.innerHTML = '';
@@ -355,6 +360,15 @@
         function updateInsideCaseButton() {
             const btn = document.getElementById('btn-roll-inside');
             
+            if (isSpinning) {
+                btn.innerText = "Пропустить анимацию";
+                btn.classList.add('skip-btn');
+                btn.classList.remove('timer-btn');
+                return;
+            }
+
+            btn.classList.remove('skip-btn');
+
             if (currentCaseType === 'nft') {
                 if (hasNft) {
                     btn.innerText = "Мои условия (0/5)";
@@ -374,6 +388,12 @@
         }
 
         function handleRollClick() {
+            if (isSpinning) {
+                // ЕСЛИ ИДЕТ КРУТКА - ПРОПУСКАЕМ
+                skipAnimation();
+                return;
+            }
+
             if (currentCaseType === 'nft') {
                 if (hasNft) { showNftConditions(); } else { startSpin(); }
             } else if (currentCaseType === 'sub') {
@@ -415,6 +435,10 @@
         }
 
         function startSpin() {
+            if (isSpinning) return; // Защита
+            
+            isSpinning = true;
+            updateInsideCaseButton(); // Меняем на "Пропустить"
             stopLiveTrack();
 
             let winItem;
@@ -450,6 +474,8 @@
                 }
             }
 
+            currentWinItem = winItem;
+
             liveTrack.innerHTML = '';
             const items = [];
             const sourceForTrack = currentCaseType === 'sub' ? subCasePrizes : nftPrizes;
@@ -469,44 +495,60 @@
             liveTrack.style.transition = 'none';
             liveTrack.style.transform = `translate(0px, -50%)`;
 
-            // Ждем отрисовки, чтобы замерить ширину
             setTimeout(() => {
-                // ИСПРАВЛЕННЫЙ РАСЧЕТ:
                 const firstItem = liveTrack.children[0];
-                // Реальная ширина элемента + отступы (margin 10px слева и справа)
                 const itemWidthWithMargin = firstItem.getBoundingClientRect().width + 20;
-                
-                // Вычисляем, насколько сдвинуть ленту, чтобы нужный элемент встал по центру
                 const containerWidth = document.querySelector('.live-roulette-area').getBoundingClientRect().width;
                 const targetOffset = -(winIndex * itemWidthWithMargin) + (containerWidth / 2) - (itemWidthWithMargin / 2);
 
                 liveTrack.style.transition = 'transform 6s cubic-bezier(0.1, 0.7, 0.1, 1)';
                 liveTrack.style.transform = `translate(${targetOffset}px, -50%)`;
 
-                setTimeout(() => {
-                    if (currentCaseType === 'nft') {
-                        hasNft = true;
-                        wonNftData = winItem;
-                        addToInventory(winItem);
-                    } else {
-                        if (!isWinNft) {
-                            bonusBalance += winItem.amount;
-                            updateUI();
-                            startTimer();
-                        } else {
-                            hasNft = true;
-                            wonNftData = winItem;
-                            addToInventory(winItem);
-                        }
-                    }
-                    
-                    updateInsideCaseButton();
-                    showWinModal(winItem);
-                    
-                    setTimeout(startLiveTrack, 1000); 
+                skipTimeout = setTimeout(() => {
+                    finishSpin(winItem);
                 }, 6100);
 
             }, 50);
+        }
+
+        // ФУНКЦИЯ ЗАВЕРШЕНИЯ (Вызывается либо таймером, либо кнопкой "Пропустить")
+        function finishSpin(winItem) {
+            if (!isSpinning) return; // Если уже завершено
+            clearTimeout(skipTimeout);
+            
+            // Мгновенно останавливаем ленту (если нажали пропустить)
+            const computedStyle = window.getComputedStyle(liveTrack);
+            const currentTransform = computedStyle.transform;
+            liveTrack.style.transition = 'none';
+            liveTrack.style.transform = currentTransform;
+
+            if (currentCaseType === 'nft') {
+                hasNft = true;
+                wonNftData = winItem;
+                addToInventory(winItem);
+            } else {
+                if (!winItem.isNft) {
+                    bonusBalance += winItem.amount;
+                    updateUI();
+                    startTimer();
+                } else {
+                    hasNft = true;
+                    wonNftData = winItem;
+                    addToInventory(winItem);
+                }
+            }
+            
+            isSpinning = false;
+            updateInsideCaseButton();
+            showWinModal(winItem);
+            
+            setTimeout(startLiveTrack, 1000); 
+        }
+
+        function skipAnimation() {
+            if (currentWinItem) {
+                finishSpin(currentWinItem);
+            }
         }
 
         function openPrizes() {
