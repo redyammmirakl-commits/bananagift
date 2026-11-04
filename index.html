@@ -238,16 +238,35 @@
         .promo-input:focus { outline: none; border-color: var(--accent); }
 
         /* КОНТРАКТЫ */
-        .contracts-container { padding: 15px; }
-        .contract-slots { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;}
+        .contracts-container { padding: 15px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;}
+        .contract-slots { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; position: relative; min-height: 70px;}
         .contract-slot { 
             width: 60px; height: 60px; background: var(--bg-panel); border-radius: 15px; 
             display: flex; justify-content: center; align-items: center; cursor: pointer;
-            border: 2px dashed #444; font-size: 24px; color: #444;
+            border: 2px dashed #444; font-size: 24px; color: #444; transition: all 0.5s ease;
         }
-        .contract-slot img { width: 80%; height: 80%; object-fit: contain;}
+        .contract-slot img { width: 80%; height: 80%; object-fit: contain; transition: all 0.5s ease;}
         .contract-slot.filled { border: 2px solid var(--accent); background: var(--bg-card);}
-        .btn-contract { background: linear-gradient(90deg, #d946ef, #8a2be2); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+
+        /* Анимация слияния */
+        .merge-active .contract-slot {
+            position: absolute; top: 0; left: 50%;
+            transform: translate(-50%, 0) scale(0.5);
+            opacity: 0;
+        }
+        .merge-active .contract-slot:first-child {
+            opacity: 1; transform: translate(-50%, 0) scale(1); z-index: 10;
+        }
+        
+        .merge-result-icon {
+            width: 80px; height: 80px; border-radius: 50%; display: none;
+            justify-content: center; align-items: center; font-size: 40px;
+            margin: 0 auto; transition: all 0.5s ease;
+        }
+        .merge-success { background: var(--green); box-shadow: 0 0 30px var(--green); }
+        .merge-fail { background: var(--red); box-shadow: 0 0 30px var(--red); }
+
+        .btn-contract { background: linear-gradient(90deg, #d946ef, #8a2be2); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; margin-top: 20px;}
         .btn-contract:disabled { background: #333; cursor: not-allowed; }
     </style>
 </head>
@@ -267,7 +286,6 @@
         </div>
     </div>
 
-    <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="screen-games" class="screen active">
         <div class="case-list">
             <h2 style="margin-top:0;">Игры</h2>
@@ -325,11 +343,13 @@
                 <div class="contract-slot" id="slot-5" onclick="openSelectForContract(4)">+</div>
             </div>
 
+            <!-- Иконка для анимации слияния -->
+            <div id="merge-result-icon" class="merge-result-icon">🎁</div>
+
             <button class="btn-contract glass-effect" id="btn-start-contract" onclick="startContract(); playClick()" disabled>Заключить контракт</button>
         </div>
     </div>
 
-    <!-- ЭКРАН ПЛАТНЫХ КЕЙСОВ -->
     <div id="screen-paid-cases" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Кейсы</h2>
@@ -653,9 +673,9 @@
             let source = getCurrentSource();
             let track = document.createElement('div');
             track.className = 'live-track';
-            track.style.animation = 'scrollBg 20s linear infinite';
+            // Добавил плавную анимацию туда-сюда (pulse)
+            track.style.animation = 'scrollBg 20s linear infinite alternate'; 
             
-            // Дублируем элементы для бесшовной прокрутки
             for (let i = 0; i < 40; i++) {
                 track.innerHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
             }
@@ -749,6 +769,7 @@
 
         // --- КОНТРАКТЫ ---
         function openSelectForContract(slotIndex) {
+            if (isAnimating) return;
             selectingContractSlotIndex = slotIndex;
             const container = document.getElementById('select-grid-container');
             const starsBtn = document.getElementById('select-stars-btn');
@@ -812,8 +833,18 @@
         }
 
         function startContract() {
-            playSpinSound();
+            if (isAnimating) return;
+            isAnimating = true;
+            document.getElementById('btn-start-contract').disabled = true;
             
+            // Визуальный эффект слияния
+            const slotsContainer = document.getElementById('contract-slots-container');
+            const resultIcon = document.getElementById('merge-result-icon');
+            slotsContainer.classList.add('merge-active');
+            resultIcon.style.display = 'flex';
+            resultIcon.className = 'merge-result-icon'; // Сброс классов
+            resultIcon.innerText = '🎁';
+
             let totalValue = 0;
             let itemsToRemove = [];
 
@@ -827,10 +858,23 @@
                 }
             }
 
-            const isSuccess = Math.random() < 0.5;
+            const isSuccess = Math.random() < 0.5; // 50% шанс
 
+            // Анимация (2 сек)
             setTimeout(() => {
-                stopSpinSound();
+                if (isSuccess) {
+                    resultIcon.classList.add('merge-success');
+                    playWinSound(); // Звук победы
+                } else {
+                    resultIcon.classList.add('merge-fail');
+                    playClick(); // Короткий клик для провала
+                }
+            }, 1000);
+
+            // Результат (3.5 сек)
+            setTimeout(() => {
+                slotsContainer.classList.remove('merge-active');
+                resultIcon.style.display = 'none';
                 
                 myInventory = myInventory.filter(item => !itemsToRemove.includes(item));
                 totalInventoryValue -= totalValue;
@@ -845,10 +889,8 @@
                     myInventory.push({...winItem, uniqueId: Date.now() + Math.random(), isLocked: false});
                     totalInventoryValue += winItem.price;
                     
-                    playWinSound();
                     showContractResult(true, winItem);
                 } else {
-                    playWinSound();
                     showContractResult(false, null);
                 }
 
@@ -857,8 +899,8 @@
                 renderInventory();
                 document.getElementById('inv-price-val').innerText = totalInventoryValue;
                 updateUI();
-
-            }, 2000);
+                isAnimating = false;
+            }, 3500);
         }
 
         function showContractResult(isSuccess, item) {
@@ -885,6 +927,7 @@
             modal.style.display = 'flex';
         }
 
+        // --- ОСТАЛЬНОЕ ---
         function openSelectModal(type) {
             const container = document.getElementById('select-grid-container');
             const starsBtn = document.getElementById('select-stars-btn');
@@ -1102,7 +1145,7 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('free-cases');
             document.getElementById('inside-case-title').innerText = (type === 'sub') ? "За подписку" : "Бесплатный NFT";
             updateInsideCaseButton();
-            initBackgroundAnimation(); // Запускаем фоновую анимацию
+            initBackgroundAnimation(); 
         }
 
         function openPaidCase(type) {
@@ -1111,7 +1154,7 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
             document.getElementById('inside-case-title').innerText = (type === 'ring') ? "Кейс Ring" : "Multicast Case";
             updateInsideCaseButton();
-            initBackgroundAnimation(); // Запускаем фоновую анимацию
+            initBackgroundAnimation(); 
         }
 
         function updateInsideCaseButton() {
@@ -1364,7 +1407,7 @@
             updateInsideCaseButton();
             setTimeout(() => {
                 playWinSound();
-                initBackgroundAnimation(); // Возвращаем фоновую анимацию
+                initBackgroundAnimation(); 
             }, 500);
         }
 
