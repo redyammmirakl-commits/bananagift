@@ -8,16 +8,16 @@
     <style>
         :root {
             /* Цвета со скриншота */
-            --bg-main: #2b3544; /* Тёмно-серо-синий фон */
-            --bg-card: #364152; /* Чуть светлее для карточек */
-            --bg-panel: #1f2733; /* Темный для панелей */
+            --bg-main: #2b3544; 
+            --bg-card: #364152; 
+            --bg-panel: #1f2733; 
             --text-main: #ffffff;
-            --text-muted: #8b9bb4; /* Сизый для второстепенного текста */
-            --accent: #2b8cee; /* Синий акцент */
+            --text-muted: #8b9bb4; 
+            --accent: #2b8cee; 
             --gold: #ffd700;
             --red: #ff4444;
             --green: #4caf50;
-            --radius: 20px; /* Сильное скругление */
+            --radius: 20px; 
         }
         body {
             margin: 0; padding: 0; background-color: var(--bg-main);
@@ -25,12 +25,48 @@
             display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none;
         }
         
+        /* === ЭФФЕКТ "КАПЛЯ" ДЛЯ ВСЕХ КЛИКАБЕЛЬНЫХ ЭЛЕМЕНТОВ === */
+        .glass-effect {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s ease;
+        }
+        
+        /* Сама капля (слой поверх контента) */
+        .glass-effect::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0) 70%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: width 0.3s, height 0.3s, opacity 0.3s;
+        }
+
+        /* Активация при нажатии */
+        .glass-effect:active::after {
+            width: 250%; height: 250%;
+            opacity: 1;
+            transition: width 0s, height 0s, opacity 0.1s; /* Мгновенное расширение */
+        }
+        
+        /* Легкое уменьшение при нажатии */
+        .glass-effect:active {
+            transform: scale(0.96);
+        }
+
         .header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px; background-color: var(--bg-card); border-bottom: 1px solid rgba(0,0,0,0.2); z-index: 10;
         }
         .balance { background: var(--bg-panel); padding: 8px 15px; border-radius: 15px; font-weight: bold; display: flex; gap: 5px; font-size: 16px; align-items: center;}
-        .top-up-btn { background-color: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 15px; font-weight: bold; font-size: 12px;}
+        .top-up-btn { background-color: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor:pointer;}
         
         .screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
@@ -60,7 +96,6 @@
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--accent); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--accent); }
         
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
-        /* Увеличил скругление картинок в ленте */
         .live-item { width: 100px; height: 100px; margin: 0 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: var(--radius); box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
@@ -76,7 +111,6 @@
             padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer;
             text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
         }
-        .btn-roll-big:active { transform: scale(0.98); }
         .btn-roll-big.timer-btn { background: var(--bg-panel); cursor: not-allowed; color: var(--text-muted); }
         .btn-roll-big.skip-btn { background: #4b5563; font-size: 16px;}
 
@@ -112,7 +146,12 @@
             display: flex; justify-content: space-around; background-color: var(--bg-card);
             padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 10;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; font-weight: 500;}
+        /* Эффект капли для иконок в меню (они круглые, поэтому эффект смотрится идеально) */
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            color: var(--text-muted); font-size: 10px; cursor: pointer; font-weight: 500;
+            padding: 10px 20px; border-radius: 20px;
+        }
         .nav-item.active { color: var(--accent); }
         .nav-item i { font-size: 22px; margin-bottom: 4px; font-style: normal; }
 
@@ -127,13 +166,14 @@
 
     <div class="header">
         <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
-        <button class="top-up-btn" onclick="tg.showAlert('Скоро!')">Пополнить</button>
+        <!-- Добавил класс glass-effect -->
+        <button class="top-up-btn glass-effect" onclick="tg.showAlert('Скоро!')">Пополнить</button>
     </div>
 
     <div id="screen-games" class="screen active">
         <div class="case-list">
             <h2 style="margin-top:0;">Кейсы</h2>
-            <div class="case-card" onclick="switchScreen('free-cases')">
+            <div class="case-card glass-effect" onclick="switchScreen('free-cases')">
                 <div class="case-header">
                     <div class="case-icon">🎁</div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатно</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">2 кейса доступно</p></div>
@@ -146,28 +186,29 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Бесплатные кейсы</h2>
             
-            <div class="case-card" onclick="openInsideCase('sub')">
+            <div class="case-card glass-effect" onclick="openInsideCase('sub')">
                 <div class="case-header">
                     <div class="case-icon">⭐</div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">За подписку</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Раз в 24 часа</p></div>
                 </div>
             </div>
 
-            <div class="case-card" onclick="openInsideCase('nft')">
+            <div class="case-card glass-effect" onclick="openInsideCase('nft')">
                 <div class="case-header">
                     <div class="case-icon">🎁</div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатный NFT</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">1 раз (5 друзей для вывода)</p></div>
                 </div>
             </div>
             
-            <button class="btn-roll-big" onclick="switchScreen('games')" style="background:var(--bg-panel); margin-top:10px; font-size: 16px;">Назад</button>
+            <button class="btn-roll-big glass-effect" onclick="switchScreen('games')" style="background:var(--bg-panel); margin-top:10px; font-size: 16px;">Назад</button>
         </div>
     </div>
 
     <div id="screen-inside-case" class="screen">
         <div class="top-nav-case">
-            <button class="icon-btn" onclick="switchScreen('free-cases')">← Назад</button>
-            <button class="icon-btn" onclick="openPrizes()">🎁 Призы</button>
+            <!-- Добавил класс glass-effect -->
+            <button class="icon-btn glass-effect" onclick="switchScreen('free-cases')">← Назад</button>
+            <button class="icon-btn glass-effect" onclick="openPrizes()">🎁 Призы</button>
         </div>
         
         <div class="live-roulette-area">
@@ -181,10 +222,10 @@
 
         <div class="bottom-panel">
             <div class="bottom-row">
-                <button class="btn-secondary" onclick="tg.showAlert('Настройки скоро!')">⚙️ Настройки</button>
-                <button class="btn-secondary" onclick="openPrizes()">🎁 Призы</button>
+                <button class="btn-secondary glass-effect" onclick="tg.showAlert('Настройки скоро!')">⚙️ Настройки</button>
+                <button class="btn-secondary glass-effect" onclick="openPrizes()">🎁 Призы</button>
             </div>
-            <button class="btn-roll-big" id="btn-roll-inside" onclick="handleRollClick()">Крутить</button>
+            <button class="btn-roll-big glass-effect" id="btn-roll-inside" onclick="handleRollClick()">Крутить</button>
         </div>
     </div>
 
@@ -207,7 +248,7 @@
     <div id="prizes-modal">
         <div class="prizes-header">
             <h3 style="margin:0;">Содержимое кейса</h3>
-            <button style="background:none; border:none; color:white; font-size:24px; cursor:pointer;" onclick="closePrizes()">✕</button>
+            <button style="background:none; border:none; color:white; font-size:24px; cursor:pointer; padding: 10px;" onclick="closePrizes()">✕</button>
         </div>
         <div class="prizes-grid" id="prizes-grid-container"></div>
     </div>
@@ -233,16 +274,18 @@
 
             <p id="win-desc" style="font-size:13px; color:var(--text-muted); margin-top:15px;"></p>
             
-            <button class="btn-action" id="win-btn" onclick="closeWinModal()" style="margin-top:20px; background:var(--accent); color:white; border:none; padding:16px; border-radius:15px; font-weight:bold; width:100%; font-size:16px; cursor:pointer;">Закрыть</button>
+            <!-- Кнопка закрытия тоже с эффектом -->
+            <button class="btn-action glass-effect" id="win-btn" onclick="closeWinModal()" style="margin-top:20px; background:var(--accent); color:white; border:none; padding:16px; border-radius:15px; font-weight:bold; width:100%; font-size:16px; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item active" onclick="switchScreen('games')"><i>🎮</i>Игры</div>
-        <div class="nav-item"><i>🎁</i>Конкурсы</div>
-        <div class="nav-item"><i>📋</i>Задания</div>
-        <div class="nav-item"><i>🏆</i>Турнир</div>
-        <div class="nav-item" onclick="switchScreen('profile')"><i>👤</i>Профиль</div>
+        <!-- Добавил класс glass-effect для меню -->
+        <div class="nav-item glass-effect active" onclick="switchScreen('games')"><i>🎮</i>Игры</div>
+        <div class="nav-item glass-effect"><i>🎁</i>Конкурсы</div>
+        <div class="nav-item glass-effect"><i>📋</i>Задания</div>
+        <div class="nav-item glass-effect"><i>🏆</i>Турнир</div>
+        <div class="nav-item glass-effect" onclick="switchScreen('profile')"><i>👤</i>Профиль</div>
     </div>
 
     <script>
