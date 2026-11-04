@@ -245,11 +245,11 @@
             </div>
         </div>
         
-        <!-- Блок с общей стоимостью -->
+        <!-- Блок с общей стоимостью (без надписи "Стоимость") -->
         <div style="text-align: center; margin-top: 25px;">
             <h3 style="margin: 0 0 10px 0; font-size: 20px;">Инвентарь</h3>
-            <div id="total-inventory-price" style="display: inline-block; background: var(--bg-card); padding: 8px 16px; border-radius: 15px; font-size: 14px; font-weight: bold; color: var(--gold);">
-                Стоимость: ⭐ <span id="inv-price-val">0</span>
+            <div id="total-inventory-price" style="display: inline-block; background: var(--bg-card); padding: 8px 20px; border-radius: 15px; font-size: 18px; font-weight: bold; color: var(--gold);">
+                <span>⭐</span> <span id="inv-price-val">0</span>
             </div>
         </div>
 
@@ -344,7 +344,6 @@
         let currentWinItem = null; 
         let skipTimeout = null; 
 
-        // ПЕРЕМЕННАЯ ДЛЯ ХРАНЕНИЯ ОБЩЕЙ СТОИМОСТИ ИНВЕНТАРЯ
         let totalInventoryValue = 0;
 
         function startTimer() {
@@ -670,7 +669,6 @@
             document.getElementById('prizes-modal').style.display = 'none';
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ В ИНВЕНТАРЬ
         function addToInventory(item) {
             document.getElementById('empty-inv-text').style.display = 'none';
             const invContainer = document.getElementById('inventory-container');
@@ -690,7 +688,6 @@
             `;
             invContainer.appendChild(invItem);
 
-            // Плюсуем стоимость предмета к общей сумме
             if (item.price) {
                 totalInventoryValue += item.price;
                 document.getElementById('inv-price-val').innerText = totalInventoryValue;
