@@ -46,25 +46,31 @@
         .screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
 
-        /* Вкладки */
-        .tabs { display: flex; padding: 0 15px; gap: 10px; margin-bottom: 15px; }
-        .tab { flex: 1; text-align: center; padding: 12px; border-radius: 15px; background: var(--bg-card); color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.2s;}
-        .tab.active { background: var(--accent); color: white; }
-
-        /* Кейсы */
-        .case-list { padding: 0 15px 15px 15px; }
+        /* Список на главном экране */
+        .case-list { padding: 15px; }
         .case-card { background: var(--bg-card); border-radius: var(--radius); padding: 20px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; cursor: pointer; }
         .case-header { display: flex; align-items: center; gap: 15px; }
         .case-icon { font-size: 40px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 18px; }
 
-        /* АПГРЕЙДЕР */
-        .upgrader-container { padding: 0 15px 15px 15px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;}
-        .upgrader-wheel { width: 220px; height: 220px; border-radius: 50%; border: 8px solid #2f2f3d; background: radial-gradient(circle, #1e1e28 40%, #2a2a38 100%); position: relative; display: flex; justify-content: center; align-items: center; margin: 10px 0 20px 0; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
-        .wheel-center { width: 80px; height: 80px; border-radius: 50%; background: var(--bg-card); display: flex; justify-content: center; align-items: center; font-size: 30px; color: var(--text-muted); }
-        .wheel-arrow { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); font-size: 30px; color: var(--gold); filter: drop-shadow(0 0 10px var(--gold)); z-index: 5; }
+        /* Экран Апгрейдера */
+        #screen-upgrader { background: var(--bg-main); }
+        .top-nav-case { display: flex; justify-content: space-between; padding: 15px; z-index: 10; }
+        .icon-btn { background: var(--bg-card); border: none; color: white; padding: 12px 20px; border-radius: 15px; font-weight: bold; font-size: 14px; cursor: pointer;}
         
-        .chance-text { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-        .chance-text span { color: var(--gold); }
+        .upgrader-container { padding: 0 15px 15px 15px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;}
+        
+        /* Колесо фортуны */
+        .wheel-wrapper { position: relative; width: 240px; height: 240px; margin: 20px 0; display: flex; justify-content: center; align-items: center; }
+        .wheel-bg {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(var(--green) 0deg, var(--green) calc(var(--chance) * 3.6deg), var(--red) calc(var(--chance) * 3.6deg), var(--red) 360deg);
+            position: absolute; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.5);
+            border: 4px solid #2f2f3d; transition: transform 0s; 
+        }
+        .wheel-inner { width: 70%; height: 70%; border-radius: 50%; background: var(--bg-card); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2; box-shadow: 0 0 10px rgba(0,0,0,0.8); }
+        .wheel-inner-chance { font-size: 24px; font-weight: bold; color: var(--gold); }
+        .wheel-inner-text { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        .wheel-arrow-top { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 30px; color: var(--gold); z-index: 10; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.8)); }
 
         .upgrade-selectors { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; align-items: stretch; }
         .selector-box { flex: 1; background: var(--bg-card); border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent; min-height: 90px;}
@@ -78,8 +84,9 @@
         .mult-btn.active { background: var(--accent); }
 
         .btn-upgrade { width: 100%; background: linear-gradient(90deg, #6a5acd, #8a2be2); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: auto; box-shadow: 0 4px 15px rgba(138,43,226,0.3);}
+        .btn-upgrade:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
 
-        /* Модалки выбора */
+        /* Модалка выбора */
         .modal-select { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; flex-direction: column; padding: 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
         .modal-select.active { display: flex; }
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
@@ -89,11 +96,9 @@
         .select-item img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px;}
         .close-modal-btn { background: var(--bg-card); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: auto; cursor: pointer;}
 
-        /* Рулетка внутри кейса */
+        /* Кейсы */
         #screen-inside-case { background: var(--bg-main); position: relative; display: none; flex-direction: column; justify-content: space-between; }
         #screen-inside-case.active { display: flex; }
-        .top-nav-case { display: flex; justify-content: space-between; padding: 15px; z-index: 10; }
-        .icon-btn { background: var(--bg-card); border: none; color: white; padding: 12px 20px; border-radius: 15px; font-weight: bold; font-size: 14px; cursor: pointer;}
         .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 20px 0; }
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--accent); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--accent); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
@@ -108,7 +113,6 @@
         .btn-roll-big.timer-btn { background: var(--bg-panel); cursor: not-allowed; color: var(--text-muted); }
         .btn-roll-big.skip-btn { background: #4b5563; font-size: 16px;}
         
-        /* Модалка призов кейса */
         #prizes-modal { display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; background: var(--bg-card); border-radius: var(--radius) var(--radius) 0 0; z-index: 150; flex-direction: column; padding: 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .prizes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -117,14 +121,12 @@
         .prize-item img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; }
         .prize-price { color: var(--gold); font-size: 13px; font-weight: bold; }
 
-        /* Окно выигрыша */
         #win-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .win-box { background: var(--bg-card); padding: 30px 20px; border-radius: var(--radius); text-align: center; width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);}
         .win-image { width: 130px; height: 130px; object-fit: contain; margin: 10px auto 20px auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3)); }
         .win-item-name { font-size: 24px; font-weight: 800; color: #fff; margin: 10px 0 5px 0; }
         .win-item-price { font-size: 18px; color: var(--gold); font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 5px;}
 
-        /* Инвентарь */
         .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px;}
         .inv-item { background: var(--bg-card); padding: 15px; border-radius: var(--radius); text-align: center; position: relative; }
         .inv-item img { width: 80px; height: 80px; object-fit: contain; }
@@ -156,29 +158,44 @@
 
     <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="screen-games" class="screen active">
-        <div class="tabs">
-            <div class="tab active" id="tab-btn-cases" onclick="switchGameTab('cases')">Кейсы</div>
-            <div class="tab" id="tab-btn-upgrader" onclick="switchGameTab('upgrader')">Апгрейд</div>
-        </div>
-
-        <!-- Вкладка Кейсы -->
-        <div id="tab-cases" class="case-list" style="display: block;">
+        <div class="case-list">
+            <h2 style="margin-top:0;">Игры</h2>
+            
+            <!-- Карточка: Бесплатные кейсы -->
             <div class="case-card glass-effect" onclick="switchScreen('free-cases')">
                 <div class="case-header">
                     <div class="case-icon">🎁</div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатно</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">2 кейса доступно</p></div>
                 </div>
             </div>
-        </div>
 
-        <!-- Вкладка Апгрейд -->
-        <div id="tab-upgrader" class="upgrader-container" style="display: none;">
-            <div class="upgrader-wheel">
-                <div class="wheel-center">+</div>
-                <div class="wheel-arrow">▲</div>
+            <!-- Карточка: Апгрейдер -->
+            <div class="case-card glass-effect" onclick="switchScreen('upgrader')">
+                <div class="case-header">
+                    <div class="case-icon">🔄</div>
+                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Апгрейдер</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Улучши свой инвентарь</p></div>
+                </div>
             </div>
 
-            <div class="chance-text">Шанс: <span id="upgrade-chance">0</span>%</div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН АПГРЕЙДЕРА -->
+    <div id="screen-upgrader" class="screen">
+        <div class="top-nav-case">
+            <button class="icon-btn glass-effect" onclick="switchScreen('games')">← Назад</button>
+        </div>
+
+        <div class="upgrader-container">
+            <!-- Колесо -->
+            <div class="wheel-wrapper">
+                <div class="wheel-arrow-top">▼</div>
+                <div class="wheel-bg" id="upgrade-wheel" style="--chance: 0;"></div>
+                <div class="wheel-inner">
+                    <div class="wheel-inner-chance" id="upgrade-chance">0%</div>
+                    <div class="wheel-inner-text">Шанс</div>
+                </div>
+            </div>
 
             <div class="upgrade-selectors">
                 <div class="selector-box glass-effect" onclick="openSelectModal('my')">
@@ -198,31 +215,23 @@
                 <button class="mult-btn glass-effect" onclick="setMultiplier(8, this)">x8</button>
             </div>
 
-            <button class="btn-upgrade glass-effect" onclick="doUpgrade()">Улучшить</button>
+            <button class="btn-upgrade glass-effect" id="btn-do-upgrade" onclick="doUpgrade()">Улучшить</button>
         </div>
     </div>
 
-    <!-- Экран выбора бесплатных кейсов -->
     <div id="screen-free-cases" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Бесплатные кейсы</h2>
             <div class="case-card glass-effect" onclick="openInsideCase('sub')">
-                <div class="case-header">
-                    <div class="case-icon">⭐</div>
-                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">За подписку</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Раз в 24 часа</p></div>
-                </div>
+                <div class="case-header"><div class="case-icon">⭐</div><div><h3 style="margin:0 0 5px 0; font-size: 18px;">За подписку</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Раз в 24 часа</p></div></div>
             </div>
             <div class="case-card glass-effect" onclick="openInsideCase('nft')">
-                <div class="case-header">
-                    <div class="case-icon">🎁</div>
-                    <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатный NFT</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">1 раз (5 друзей для вывода)</p></div>
-                </div>
+                <div class="case-header"><div class="case-icon">🎁</div><div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатный NFT</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">1 раз (5 друзей для вывода)</p></div></div>
             </div>
             <button class="btn-roll-big glass-effect" onclick="switchScreen('games')" style="background:var(--bg-card); margin-top:10px; font-size: 16px;">Назад</button>
         </div>
     </div>
 
-    <!-- Внутренний экран кейса -->
     <div id="screen-inside-case" class="screen">
         <div class="top-nav-case">
             <button class="icon-btn glass-effect" onclick="switchScreen('free-cases')">← Назад</button>
@@ -232,9 +241,7 @@
             <div class="live-line"></div>
             <div class="live-track" id="live-track"></div>
         </div>
-        <div class="case-title-area">
-            <h2 id="inside-case-title">Кейс</h2>
-        </div>
+        <div class="case-title-area"><h2 id="inside-case-title">Кейс</h2></div>
         <div class="bottom-panel">
             <div class="bottom-row">
                 <button class="btn-secondary glass-effect" onclick="tg.showAlert('Скоро!')">⚙️ Настройки</button>
@@ -244,7 +251,6 @@
         </div>
     </div>
 
-    <!-- Профиль -->
     <div id="screen-profile" class="screen">
         <h2 style="margin-top:20px; padding: 0 15px;">Профиль</h2>
         <div style="background:var(--bg-card); margin: 0 15px; padding:20px; border-radius:var(--radius); display:flex; align-items:center; gap:15px;">
@@ -261,13 +267,11 @@
                 <span>⭐</span> <span id="inv-price-val">0</span>
             </div>
         </div>
-
         <div id="inventory-container" class="inventory-grid">
             <p style="color:var(--text-muted); font-size:14px; grid-column: span 2; text-align:center;" id="empty-inv-text">Инвентарь пуст</p>
         </div>
     </div>
 
-    <!-- Модалка выбора предметов -->
     <div id="modal-select" class="modal-select">
         <div class="modal-title" id="modal-select-title">Выберите подарок</div>
         <div class="select-grid" id="select-grid-container"></div>
@@ -321,55 +325,28 @@
         function stopSpinSound() { soundSpin.pause(); soundSpin.currentTime = 0; }
         function playWinSound() { soundWin.currentTime = 0; soundWin.play().catch(e => {}); }
 
-        let myReferrals = 0; 
-        const neededReferrals = 5;
-        let hasNft = false; 
-        let wonNftData = null; 
-        let donateBalance = 0; 
-        let bonusBalance = 0;   
+        let myReferrals = 0; const neededReferrals = 5;
+        let hasNft = false; let wonNftData = null; 
+        let donateBalance = 0; let bonusBalance = 0;   
         let currentCaseType = 'nft'; 
-        let starsClaimed = false; 
-        let timerInterval = null;
-        let timeLeft = 24 * 60 * 60; 
-        let isSpinning = false; 
-        let currentWinItem = null; 
-        let skipTimeout = null; 
+        let starsClaimed = false; let timerInterval = null; let timeLeft = 24 * 60 * 60; 
+        let isSpinning = false; let currentWinItem = null; let skipTimeout = null; 
         
-        // ИНВЕНТАРЬ (Реальные данные)
         let myInventory = []; 
         let totalInventoryValue = 0;
-
-        // АПГРЕЙД
-        let selectedMyItem = null;
-        let selectedTargetItem = null;
-        let currentMultiplier = 1;
+        let selectedMyItem = null; let selectedTargetItem = null;
 
         const nftPrizes = [
-            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
-            { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', chance: 0.4, price: 546 },
+            { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 440 },
             { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', chance: 2, price: 370 },
             { id: 'socks', name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', chance: 5, price: 370 },
             { id: 'flame', name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 370 },
             { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', chance: 12.5, price: 370 },
-            { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 440 }
-        ];
+            { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', chance: 0.4, price: 546 },
+            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 }
+        ].sort((a, b) => a.price - b.price);
+        
         const subCasePrizes = nftPrizes.filter(p => p.id !== 'cat');
-
-        // --- ВКЛАДКИ ИГР ---
-        function switchGameTab(tab) {
-            document.getElementById('tab-btn-cases').classList.remove('active');
-            document.getElementById('tab-btn-upgrader').classList.remove('active');
-            document.getElementById('tab-cases').style.display = 'none';
-            document.getElementById('tab-upgrader').style.display = 'none';
-            
-            if(tab === 'cases') {
-                document.getElementById('tab-btn-cases').classList.add('active');
-                document.getElementById('tab-cases').style.display = 'block';
-            } else {
-                document.getElementById('tab-btn-upgrader').classList.add('active');
-                document.getElementById('tab-upgrader').style.display = 'flex';
-            }
-        }
 
         // --- АПГРЕЙД ЛОГИКА ---
         function openSelectModal(type) {
@@ -385,34 +362,38 @@
                     myInventory.forEach((prize, index) => {
                         const div = document.createElement('div');
                         div.className = 'select-item';
-                        div.onclick = () => { selectMyItem(prize, index); closeSelectModal(); };
+                        div.onclick = () => { 
+                            selectedMyItem = { ...prize, invIndex: index };
+                            document.getElementById('my-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
+                            calculateChance(); closeSelectModal(); 
+                        };
                         div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
                         container.appendChild(div);
                     });
                 }
             } else {
                 document.getElementById('modal-select-title').innerText = 'Выберите желаемый подарок';
-                nftPrizes.forEach(prize => {
-                    const div = document.createElement('div');
-                    div.className = 'select-item';
-                    div.onclick = () => { selectTargetItem(prize); closeSelectModal(); };
-                    div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
-                    container.appendChild(div);
-                });
+                let availableTargets = nftPrizes;
+                if (selectedMyItem) {
+                    availableTargets = nftPrizes.filter(p => p.price > selectedMyItem.price);
+                }
+                if (availableTargets.length === 0) {
+                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет предметов дороже вашего</p>';
+                } else {
+                    availableTargets.forEach(prize => {
+                        const div = document.createElement('div');
+                        div.className = 'select-item';
+                        div.onclick = () => { 
+                            selectedTargetItem = prize;
+                            document.getElementById('target-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
+                            calculateChance(); closeSelectModal(); 
+                        };
+                        div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
+                        container.appendChild(div);
+                    });
+                }
             }
             modal.classList.add('active');
-        }
-
-        function selectMyItem(prize, index) {
-            selectedMyItem = { ...prize, invIndex: index };
-            document.getElementById('my-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
-            calculateChance();
-        }
-
-        function selectTargetItem(prize) {
-            selectedTargetItem = prize;
-            document.getElementById('target-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
-            calculateChance();
         }
 
         function closeSelectModal() { document.getElementById('modal-select').classList.remove('active'); }
@@ -421,68 +402,94 @@
             if (!selectedMyItem) { tg.showAlert("Сначала выберите свой подарок!"); return; }
             document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
-            currentMultiplier = mult;
             
-            // Ищем ближайший по цене предмет для множителя
             let targetPrice = selectedMyItem.price * mult;
-            let closestPrize = nftPrizes[0];
+            let closestPrize = null;
             let minDiff = Infinity;
             
             nftPrizes.forEach(p => {
-                let diff = Math.abs(p.price - targetPrice);
-                if (diff < minDiff) { minDiff = diff; closestPrize = p; }
+                if (p.price > selectedMyItem.price) {
+                    let diff = Math.abs(p.price - targetPrice);
+                    if (diff < minDiff) { minDiff = diff; closestPrize = p; }
+                }
             });
             
-            selectTargetItem(closestPrize);
+            if (closestPrize) {
+                selectedTargetItem = closestPrize;
+                document.getElementById('target-item-content').innerHTML = `<img src="${closestPrize.img}" class="selector-img">${closestPrize.name}`;
+                calculateChance();
+            }
         }
 
         function calculateChance() {
+            const btn = document.getElementById('btn-do-upgrade');
             if (!selectedMyItem || !selectedTargetItem) {
-                document.getElementById('upgrade-chance').innerText = '0';
+                document.getElementById('upgrade-chance').innerText = '0%';
+                document.getElementById('upgrade-wheel').style.setProperty('--chance', 0);
+                btn.disabled = true;
                 return;
             }
             let chance = (selectedMyItem.price / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
-            document.getElementById('upgrade-chance').innerText = chance.toFixed(1);
+            
+            document.getElementById('upgrade-chance').innerText = chance.toFixed(1) + '%';
+            document.getElementById('upgrade-wheel').style.setProperty('--chance', chance);
+            btn.disabled = false;
         }
 
         function doUpgrade() {
-            if (!selectedMyItem || !selectedTargetItem) {
-                tg.showAlert("Выберите оба подарка!");
-                return;
-            }
+            if (!selectedMyItem || !selectedTargetItem) return;
 
             let chance = (selectedMyItem.price / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
 
             const isSuccess = Math.random() * 100 <= chance;
+            const btn = document.getElementById('btn-do-upgrade');
+            const wheel = document.getElementById('upgrade-wheel');
             
-            // Удаляем старый предмет из инвентаря
-            const invIndex = selectedMyItem.invIndex;
-            totalInventoryValue -= myInventory[invIndex].price;
-            myInventory.splice(invIndex, 1);
+            btn.disabled = true;
+            btn.innerText = "Крутим...";
+            playSpinSound();
 
-            if (isSuccess) {
-                playWinSound();
-                tg.showAlert(`УСПЕХ! Вы получили ${selectedTargetItem.name} (${selectedTargetItem.price} ⭐).`);
-                myInventory.push(selectedTargetItem);
-                totalInventoryValue += selectedTargetItem.price;
-            } else {
-                playWinSound();
-                tg.showAlert(`НЕУДАЧА! Предмет сгорел.`);
-            }
-
-            // Обновляем UI
-            renderInventory();
-            document.getElementById('inv-price-val').innerText = totalInventoryValue;
+            const randomSpin = Math.floor(Math.random() * 360);
+            const totalRotation = 360 * 5 + randomSpin;
             
-            // Сброс выбора
-            selectedMyItem = null;
-            selectedTargetItem = null;
-            document.getElementById('my-item-content').innerText = 'Выбрать';
-            document.getElementById('target-item-content').innerText = 'Выбрать';
-            document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
-            calculateChance();
+            wheel.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                stopSpinSound();
+                playWinSound();
+
+                const invIndex = selectedMyItem.invIndex;
+                totalInventoryValue -= myInventory[invIndex].price;
+                myInventory.splice(invIndex, 1);
+
+                if (isSuccess) {
+                    tg.showAlert(`УСПЕХ! Вы получили ${selectedTargetItem.name} (${selectedTargetItem.price} ⭐).`);
+                    myInventory.push(selectedTargetItem);
+                    totalInventoryValue += selectedTargetItem.price;
+                } else {
+                    tg.showAlert(`НЕУДАЧА! Предмет сгорел.`);
+                }
+
+                renderInventory();
+                document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                
+                selectedMyItem = null;
+                selectedTargetItem = null;
+                document.getElementById('my-item-content').innerText = 'Выбрать';
+                document.getElementById('target-item-content').innerText = 'Выбрать';
+                document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
+                calculateChance();
+                
+                wheel.style.transition = 'none';
+                wheel.style.transform = 'rotate(0deg)';
+                
+                btn.innerText = "Улучшить";
+                btn.disabled = false;
+
+            }, 4100);
         }
 
         function renderInventory() {
@@ -522,7 +529,7 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + screenId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if(screenId === 'games' || screenId === 'inside-case') document.querySelectorAll('.nav-item')[0].classList.add('active');
+            if(screenId === 'games' || screenId === 'inside-case' || screenId === 'upgrader') document.querySelectorAll('.nav-item')[0].classList.add('active');
             if(screenId === 'profile') document.querySelectorAll('.nav-item')[4].classList.add('active');
             if(screenId === 'games') stopLiveTrack();
         }
@@ -647,22 +654,16 @@
             liveTrack.style.transition = 'none'; liveTrack.style.transform = window.getComputedStyle(liveTrack).transform;
 
             if (currentCaseType === 'nft') { 
-                hasNft = true; 
-                wonNftData = winItem; 
-                myInventory.push(winItem);
-                totalInventoryValue += winItem.price;
-                renderInventory();
-                document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                hasNft = true; wonNftData = winItem; 
+                myInventory.push(winItem); totalInventoryValue += winItem.price;
+                renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
             } 
             else {
                 if (!winItem.isNft) { bonusBalance += winItem.amount; updateUI(); startTimer(); } 
                 else { 
-                    hasNft = true; 
-                    wonNftData = winItem; 
-                    myInventory.push(winItem);
-                    totalInventoryValue += winItem.price;
-                    renderInventory();
-                    document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                    hasNft = true; wonNftData = winItem; 
+                    myInventory.push(winItem); totalInventoryValue += winItem.price;
+                    renderInventory(); document.getElementById('inv-price-val').innerText = totalInventoryValue;
                 }
             }
             isSpinning = false; updateInsideCaseButton(); showWinModal(winItem);
