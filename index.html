@@ -126,15 +126,13 @@
         .prize-item img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; }
         .prize-price { color: var(--gold); font-size: 13px; font-weight: bold; }
 
-        /* ОКНО ВЫИГРЫША */
         #win-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 200; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .win-box { background: var(--bg-card); padding: 30px 20px; border-radius: var(--radius); text-align: center; width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);}
         
-        /* ГОЛУБОЙ КВАДРАТ ДЛЯ КАРТИНКИ */
         .win-image-container {
             width: 140px; height: 140px;
-            background: linear-gradient(135deg, #2b5876, #4e4376); /* Сине-голубой градиент */
-            border-radius: 25px; /* Скругленные углы */
+            background: linear-gradient(135deg, #2b5876, #4e4376);
+            border-radius: 25px;
             display: flex; justify-content: center; align-items: center;
             margin: 10px auto 20px auto;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
@@ -150,10 +148,17 @@
         .inv-item img { width: 80px; height: 80px; object-fit: contain; }
         .inv-item .lock { position: absolute; top: 10px; right: 10px; font-size: 18px; }
         
-        .nav-bar { display: flex; justify-content: space-around; background-color: var(--bg-card); padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 10; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 10px; cursor: pointer; font-weight: 500; padding: 10px 20px; border-radius: 20px; }
+        /* ОБНОВЛЕННОЕ НИЖНЕЕ МЕНЮ (БЕЗ ЭМОДЗИ) */
+        .nav-bar { 
+            display: flex; justify-content: space-around; background-color: var(--bg-card); 
+            padding: 15px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 10; 
+        }
+        .nav-item { 
+            display: flex; flex-direction: column; align-items: center; 
+            color: var(--text-muted); font-size: 13px; cursor: pointer; font-weight: 600; 
+            padding: 5px 15px; border-radius: 20px; transition: 0.2s;
+        }
         .nav-item.active { color: var(--accent); }
-        .nav-item i { font-size: 22px; margin-bottom: 4px; font-style: normal; }
 
         .progress-bar { background: var(--bg-panel); border-radius: 10px; height: 10px; width: 100%; margin: 8px 0; overflow: hidden; }
         .progress-fill { background: var(--accent); height: 100%; width: 0%; transition: width 0.3s; }
@@ -298,7 +303,6 @@
 
     <div id="win-modal">
         <div class="win-box">
-            <!-- ГОЛУБОЙ КВАДРАТ ДЛЯ КАРТИНКИ -->
             <div class="win-image-container">
                 <img id="win-image" class="win-image" src="" style="display:none;">
             </div>
@@ -320,12 +324,13 @@
         </div>
     </div>
 
+    <!-- ОБНОВЛЕННОЕ МЕНЮ -->
     <div class="nav-bar">
-        <div class="nav-item glass-effect active" onclick="switchScreen('games'); playClick()"><i>🎮</i>Игры</div>
-        <div class="nav-item glass-effect" onclick="playClick()"><i>🎁</i>Конкурсы</div>
-        <div class="nav-item glass-effect" onclick="playClick()"><i>📋</i>Задания</div>
-        <div class="nav-item glass-effect" onclick="playClick()"><i>🏆</i>Турнир</div>
-        <div class="nav-item glass-effect" onclick="switchScreen('profile'); playClick()"><i>👤</i>Профиль</div>
+        <div class="nav-item glass-effect active" onclick="switchScreen('games'); playClick()">Игры</div>
+        <div class="nav-item glass-effect" onclick="playClick()">Конкурсы</div>
+        <div class="nav-item glass-effect" onclick="playClick()">Задания</div>
+        <div class="nav-item glass-effect" onclick="playClick()">Турнир</div>
+        <div class="nav-item glass-effect" onclick="switchScreen('profile'); playClick()">Профиль</div>
     </div>
 
     <script>
@@ -376,14 +381,25 @@
             
             if (type === 'my') {
                 document.getElementById('modal-select-title').innerText = 'Выберите свой подарок';
-                if (myInventory.length === 0) {
-                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Инвентарь пуст</p>';
+                
+                // ФИЛЬТР: Берем только разблокированные предметы
+                let availableItems = myInventory.filter((item, index) => {
+                    // Проверяем, разблокирован ли предмет
+                    // Если у нас есть 5 рефералов, то все разблокированы
+                    // Если меньше, то проверяем, есть ли замок (в нашем случае мы просто скрываем те, что упали из заблокированного кейса)
+                    // Для простоты: если у нас меньше 5 рефов, мы не даем апгрейдить предметы с пометкой locked
+                    return myReferrals >= neededReferrals || !item.isLocked; 
+                });
+
+                if (availableItems.length === 0) {
+                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков для улучшения (или инвентарь пуст)</p>';
                 } else {
-                    myInventory.forEach((prize, index) => {
+                    availableItems.forEach((prize) => {
+                        const originalIndex = myInventory.findIndex(i => i.uniqueId === prize.uniqueId);
                         const div = document.createElement('div');
                         div.className = 'select-item';
                         div.onclick = () => { 
-                            selectedMyItem = { ...prize, invIndex: index };
+                            selectedMyItem = { ...prize, invIndex: originalIndex };
                             document.getElementById('my-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
                             calculateChance(); closeSelectModal(); playClick(); 
                         };
@@ -492,7 +508,6 @@
                 totalInventoryValue -= myInventory[invIndex].price;
                 myInventory.splice(invIndex, 1);
 
-                // ВМЕСТО СИСТЕМНОГО АЛЕРТА ПОКАЗЫВАЕМ КРАСИВОЕ ОКНО
                 if (isSuccess) {
                     myInventory.push(selectedTargetItem);
                     totalInventoryValue += selectedTargetItem.price;
@@ -530,9 +545,10 @@
             }
 
             myInventory.forEach((item, index) => {
+                const isLocked = myReferrals < neededReferrals && item.isLocked; // Проверяем, заблокирован ли
                 invContainer.innerHTML += `
                     <div class="inv-item">
-                        <img src="${item.img}"> ${myReferrals < neededReferrals ? '<div class="lock">🔒</div>' : ''}
+                        <img src="${item.img}"> ${isLocked ? '<div class="lock">🔒</div>' : ''}
                         <p style="margin:10px 0 0 0; font-size:13px; font-weight:bold;">${item.name}</p>
                     </div>`;
             });
@@ -642,6 +658,8 @@
                 winItem = nftPrizes[nftPrizes.length - 1];
                 for (let p of nftPrizes) { cumulative += p.chance; if (rand <= cumulative) { winItem = p; break; } }
                 winItem.isNft = true;
+                winItem.isLocked = true; // Помечаем как заблокированный
+                winItem.uniqueId = Date.now() + Math.random(); // Уникальный ID
             } else {
                 const rand = Math.random() * 100;
                 if (rand < 90) {
@@ -652,6 +670,8 @@
                     const totalNftChance = subCasePrizes.reduce((sum, p) => sum + p.chance, 0);
                     for (let p of subCasePrizes) { cumulative += (p.chance / totalNftChance) * 100; if (randNft <= cumulative) { winItem = p; break; } }
                     winItem.isNft = true;
+                    winItem.isLocked = true; // Заблокирован
+                    winItem.uniqueId = Date.now() + Math.random();
                 }
             }
 
@@ -742,7 +762,6 @@
             modal.style.display = 'flex';
         }
 
-        // Окно выигрыша для АПГРЕЙДЕРА
         function showUpgradeWinModal(item, isSuccess) {
             const modal = document.getElementById('win-modal');
             document.getElementById('win-image').src = item.img; document.getElementById('win-image').style.display = 'block';
@@ -763,7 +782,7 @@
 
         function closeWinModal() { 
             document.getElementById('win-modal').style.display = 'none'; 
-            document.getElementById('win-title').style.color = 'var(--text-muted)'; // Сброс цвета
+            document.getElementById('win-title').style.color = 'var(--text-muted)'; 
         }
         function updateUI() { document.getElementById('user-balance').innerText = donateBalance + bonusBalance; }
         updateUI();
