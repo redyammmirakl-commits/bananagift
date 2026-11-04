@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            /* Цвета со скриншота */
             --bg-main: #2b3544; 
             --bg-card: #364152; 
             --bg-panel: #1f2733; 
@@ -25,14 +24,12 @@
             display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none;
         }
         
-        /* === ЭФФЕКТ "КАПЛЯ" ДЛЯ ВСЕХ КЛИКАБЕЛЬНЫХ ЭЛЕМЕНТОВ === */
+        /* Эффект "Капля" */
         .glass-effect {
             position: relative;
             overflow: hidden;
             transition: transform 0.1s ease;
         }
-        
-        /* Сама капля (слой поверх контента) */
         .glass-effect::after {
             content: '';
             position: absolute;
@@ -48,25 +45,52 @@
             -webkit-backdrop-filter: blur(5px);
             transition: width 0.3s, height 0.3s, opacity 0.3s;
         }
-
-        /* Активация при нажатии */
         .glass-effect:active::after {
             width: 250%; height: 250%;
             opacity: 1;
-            transition: width 0s, height 0s, opacity 0.1s; /* Мгновенное расширение */
+            transition: width 0s, height 0s, opacity 0.1s;
         }
-        
-        /* Легкое уменьшение при нажатии */
         .glass-effect:active {
             transform: scale(0.96);
         }
 
+        /* ОБНОВЛЕННАЯ ШАПКА */
         .header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px; background-color: var(--bg-card); border-bottom: 1px solid rgba(0,0,0,0.2); z-index: 10;
         }
-        .balance { background: var(--bg-panel); padding: 8px 15px; border-radius: 15px; font-weight: bold; display: flex; gap: 5px; font-size: 16px; align-items: center;}
-        .top-up-btn { background-color: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor:pointer;}
+        
+        /* Логотип Banana Gift */
+        .logo-btn {
+            font-size: 18px;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .logo-btn span {
+            color: #a0aec0; /* Серый цвет для второй части */
+            font-weight: 600;
+        }
+
+        /* Правая часть шапки (Баланс + Пополнить) */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .balance { background: var(--bg-panel); padding: 8px 12px; border-radius: 15px; font-weight: bold; display: flex; gap: 5px; font-size: 15px; align-items: center;}
+        .top-up-btn { background-color: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 15px; font-weight: bold; font-size: 13px; cursor:pointer;}
         
         .screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
@@ -146,7 +170,6 @@
             display: flex; justify-content: space-around; background-color: var(--bg-card);
             padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.1); z-index: 10;
         }
-        /* Эффект капли для иконок в меню (они круглые, поэтому эффект смотрится идеально) */
         .nav-item { 
             display: flex; flex-direction: column; align-items: center; 
             color: var(--text-muted); font-size: 10px; cursor: pointer; font-weight: 500;
@@ -164,10 +187,18 @@
     <audio id="sound-spin" src="spin.mp3" preload="auto"></audio>
     <audio id="sound-win" src="win.mp3" preload="auto"></audio>
 
+    <!-- ОБНОВЛЕННАЯ ШАПКА -->
     <div class="header">
-        <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
-        <!-- Добавил класс glass-effect -->
-        <button class="top-up-btn glass-effect" onclick="tg.showAlert('Скоро!')">Пополнить</button>
+        <!-- Кнопка-логотип слева -->
+        <button class="logo-btn glass-effect" onclick="switchScreen('games')">
+            Banana<span>Gift</span>
+        </button>
+
+        <!-- Баланс и Пополнить справа -->
+        <div class="header-right">
+            <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
+            <button class="top-up-btn glass-effect" onclick="tg.showAlert('Скоро!')">Пополнить</button>
+        </div>
     </div>
 
     <div id="screen-games" class="screen active">
@@ -206,7 +237,6 @@
 
     <div id="screen-inside-case" class="screen">
         <div class="top-nav-case">
-            <!-- Добавил класс glass-effect -->
             <button class="icon-btn glass-effect" onclick="switchScreen('free-cases')">← Назад</button>
             <button class="icon-btn glass-effect" onclick="openPrizes()">🎁 Призы</button>
         </div>
@@ -274,13 +304,11 @@
 
             <p id="win-desc" style="font-size:13px; color:var(--text-muted); margin-top:15px;"></p>
             
-            <!-- Кнопка закрытия тоже с эффектом -->
             <button class="btn-action glass-effect" id="win-btn" onclick="closeWinModal()" style="margin-top:20px; background:var(--accent); color:white; border:none; padding:16px; border-radius:15px; font-weight:bold; width:100%; font-size:16px; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
     <div class="nav-bar">
-        <!-- Добавил класс glass-effect для меню -->
         <div class="nav-item glass-effect active" onclick="switchScreen('games')"><i>🎮</i>Игры</div>
         <div class="nav-item glass-effect"><i>🎁</i>Конкурсы</div>
         <div class="nav-item glass-effect"><i>📋</i>Задания</div>
