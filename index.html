@@ -536,28 +536,21 @@
 
         const subCasePrizes = allNftPrizes.filter(p => p.id !== 'cat');
 
-        // Призы для кейса Ring (обычный)
+        // Призы для кейса Ring (ОБНОВЛЕНО: без дорогих и без Bunny Muffin)
         const ringCasePrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 3631 },
-            { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 27144 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1180 },
             { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 1.5, price: 635 },
-            { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1.5, price: 817 },
-            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 2, price: 7806 },
-            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 2, price: 12801 },
-            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 3, price: 454 },
-            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 3, price: 1724 },
-            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 3, price: 817 },
             { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 4, price: 635 },
             { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 4, price: 635 },
             { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 5, price: 545 },
             { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 10, price: 454 },
             { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 454 },
             { name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', chance: 10, price: 545 },
-            { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 25, isStar: true },
+            { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 25, isStar: true },
             { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 15, isStar: true },
-            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 10, isStar: true },
-            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
+            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 12, price: 10, isStar: true },
+            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 12, price: 5, isStar: true }
         ];
 
         // Призы для кейса Multicast (СИЛЬНО УРЕЗАННЫЕ ШАНСЫ НА ДОРОГИЕ NFT)
@@ -850,7 +843,6 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('free-cases');
             document.getElementById('inside-case-title').innerText = (type === 'sub') ? "За подписку" : "Бесплатный NFT";
             updateInsideCaseButton();
-            // Очищаем контейнер с лентами при входе
             document.getElementById('roulette-rows-container').innerHTML = '';
         }
 
@@ -860,7 +852,6 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
             document.getElementById('inside-case-title').innerText = (type === 'ring') ? "Кейс Ring" : "Multicast Case";
             updateInsideCaseButton();
-            // Очищаем контейнер с лентами при входе
             document.getElementById('roulette-rows-container').innerHTML = '';
         }
 
