@@ -139,14 +139,13 @@
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--purple); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--purple); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
         
-        /* УМЕНЬШИЛ РАЗМЕР ИКОНОК, ЧТОБЫ БОЛЬШЕ ВЛЕЗАЛО */
         .live-item { width: 50px; height: 50px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
         /* ИДЕАЛЬНАЯ ФОНОВАЯ АНИМАЦИЯ */
         @keyframes scrollBg {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } /* Сдвигаем ровно на половину (на ширину одной копии) */
+            100% { transform: translateX(-50%); } 
         }
 
         #multicast-text {
@@ -161,8 +160,11 @@
         .case-title-area { text-align: center; z-index: 10; margin-bottom: 10px;}
         .case-title-area h2 { margin: 0; font-size: 24px; font-weight: 800;}
         .bottom-panel { padding: 15px; background: var(--bg-card); border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.2);}
-        .bottom-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        
+        /* ОТЛИЧИЕ: Убрали кнопку настроек, сделали одну кнопку на всю ширину */
+        .bottom-row { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
         .btn-secondary { flex: 1; background: var(--bg-panel); border: none; color: white; padding: 16px; border-radius: 18px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        
         .btn-roll-big { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
         .btn-roll-big.timer-btn { background: var(--bg-panel); cursor: not-allowed; color: var(--text-muted); }
         .btn-roll-big.skip-btn { background: #4b5563; font-size: 16px;}
@@ -249,7 +251,6 @@
         }
         .contract-slot img { width: 80%; height: 80%; object-fit: contain; transition: all 0.5s ease;}
 
-        /* Визуализация анимации: предметы слетаются в центр */
         .flying-item {
             position: fixed; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;
             background: var(--bg-card); border-radius: 15px; z-index: 1000; pointer-events: none;
@@ -257,7 +258,6 @@
         }
         .flying-item img { width: 80%; height: 80%; object-fit: contain;}
 
-        /* Черный круг по центру */
         .contract-center-circle {
             width: 100px; height: 100px; border-radius: 50%; background: #000;
             display: flex; justify-content: center; align-items: center; position: relative;
@@ -471,12 +471,14 @@
         </div>
 
         <div class="case-title-area"><h2 id="inside-case-title">Кейс</h2></div>
+        
+        <!-- ИЗМЕНЕННАЯ НИЖНЯЯ ПАНЕЛЬ (БЕЗ НАСТРОЕК) -->
         <div class="bottom-panel">
             <div class="bottom-row">
-                <button class="btn-secondary glass-effect" onclick="tg.showAlert('Скоро!'); playClick()">⚙️ Настройки</button>
-                <button class="btn-secondary glass-effect" onclick="openPrizes(); playClick()">🎁 Призы</button>
+                <button class="btn-secondary glass-effect" onclick="openPrizes(); playClick()" style="width: 100%;">🎁 Призы</button>
             </div>
-            <button class="btn-roll-big glass-effect" id="btn-roll-inside" onclick="handleRollClick(); playClick()">Крутить</button>
+            <!-- Кнопка "Крутить" теперь с фиолетовым градиентом для отличия -->
+            <button class="btn-roll-big glass-effect" id="btn-roll-inside" onclick="handleRollClick(); playClick()" style="background: linear-gradient(90deg, #6a5acd, #8a2be2);">Крутить</button>
         </div>
     </div>
 
@@ -602,7 +604,7 @@
 
         let hasToppedUp100 = false;
 
-        // БАЗА ВСЕХ NFT (ДЛЯ АПГРЕЙДА И КОНТРАКТОВ)
+        // БАЗА ВСЕХ NFT
         const allNftPrizes = [
             { id: 'signet', name: 'Signet Ring', img: 'Без названия116_20261104163406.png', price: 3631 },
             { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', price: 27144 },
@@ -610,7 +612,7 @@
             { id: 'santa', name: 'Santa Hat', img: 'Без названия119_20261104164244.png', price: 635 },
             { id: 'bunny', name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', price: 817 },
             { id: 'perfume', name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', price: 7806 },
-            { id: 'mask', name: 'Myth Mask', img: 'Без названия127_20261104180603.png', price: 1177 }, // Изменено
+            { id: 'mask', name: 'Myth Mask', img: 'Без названия127_20261104180603.png', price: 1177 }, 
             { id: 'loot', name: 'Loot Bag', img: 'Без названия125_20261104175552.png', price: 12801 },
             { id: 'snake', name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', price: 454 },
             { id: 'cigar', name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', price: 1724 },
@@ -620,12 +622,11 @@
             { id: 'sword', name: 'Light Sword', img: 'Без названия122_20261104165019.png', price: 635 },
             { id: 'liberty', name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', price: 545 },
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', price: 454 },
-            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', price: 500 }, // Изменено
+            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', price: 500 }, 
             { id: 'socks', name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', price: 545 },
             { id: 'flame', name: 'Chill Flame', img: 'Без названия109_20261104034940.png', price: 454 },
-            { id: 'stocking', name: 'Xmas Stacking', img: 'Без названия111_20261104035019.png', price: 460 }, // Изменено
+            { id: 'stocking', name: 'Xmas Stacking', img: 'Без названия111_20261104035019.png', price: 460 }, 
 
-            // НОВЫЕ NFT (Добавлены в базу, но не в кейсы)
             { id: 'mirage', name: 'Mirage Lamp', img: 'Без названия131_20261105002100.png', price: 580 },
             { id: 'snoop', name: 'Snoop Dogg', img: 'Без названия132_20261105002343.png', price: 550 },
             { id: 'ramen', name: 'Instant Ramen', img: 'Без названия133_20261105002607.png', price: 470 },
@@ -641,7 +642,6 @@
 
         const subCasePrizes = allNftPrizes.filter(p => p.id !== 'cat');
 
-        // КЕЙС RING (ОСТАВЛЯЕМ СТАРЫЕ)
         const ringCasePrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 3631 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1180 },
@@ -658,7 +658,6 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 12, price: 5, isStar: true }
         ];
 
-        // КЕЙС MULTICAST (ОСТАВЛЯЕМ СТАРЫЕ)
         const multicastPrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.05, price: 3631 },
             { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.01, price: 27144 },
@@ -682,27 +681,20 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
-        // ИДЕАЛЬНАЯ ФОНОВАЯ АНИМАЦИЯ
         function initBackgroundAnimation() {
             const container = document.getElementById('roulette-rows-container');
-            
-            // Очищаем полностью перед созданием новой
             container.innerHTML = '';
             
             let source = getCurrentSource();
             let track = document.createElement('div');
             track.className = 'live-track';
             
-            // Чтобы не было разрывов, дублируем массив элементов ровно в 2 раза
             let elementsHTML = '';
             for (let i = 0; i < 50; i++) {
                 elementsHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
             }
             
-            // Ставим две копии подряд
             track.innerHTML = elementsHTML + elementsHTML;
-            
-            // Принудительно включаем анимацию
             track.style.animation = 'scrollBg 20s linear infinite';
             
             const row = document.createElement('div');
@@ -716,7 +708,7 @@
             if (currentCaseType === 'sub') return subCasePrizes;
             else if (currentCaseType === 'ring') return ringCasePrizes;
             else if (currentCaseType === 'multicast') return multicastPrizes;
-            else return nftPrizes;
+            else return subCasePrizes;
         }
 
         function fakeTopUp(amount = 100) {
@@ -792,7 +784,6 @@
             });
         }
 
-        // --- КОНТРАКТЫ ---
         function openSelectForContract(slotIndex) {
             if (isAnimating) return;
             selectingContractSlotIndex = slotIndex;
@@ -1011,7 +1002,6 @@
             modal.style.display = 'flex';
         }
 
-        // --- ОСТАЛЬНОЕ ---
         function openSelectModal(type) {
             const container = document.getElementById('select-grid-container');
             const starsBtn = document.getElementById('select-stars-btn');
@@ -1491,7 +1481,7 @@
             updateInsideCaseButton();
             setTimeout(() => {
                 playWinSound();
-                initBackgroundAnimation(); // Возвращаем фоновую анимацию
+                initBackgroundAnimation();
             }, 500);
         }
 
