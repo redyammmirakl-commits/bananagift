@@ -56,9 +56,7 @@
         .icon-btn { background: var(--bg-card); border: none; color: white; padding: 12px 20px; border-radius: 15px; font-weight: bold; font-size: 14px; cursor: pointer;}
         .upgrader-container { padding: 0 15px 15px 15px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box;}
         
-        /* Колесо фортуны (ТЕПЕРЬ КРУТИТСЯ СТРЕЛКА) */
         .wheel-wrapper { position: relative; width: 240px; height: 240px; margin: 20px 0; display: flex; justify-content: center; align-items: center; }
-        
         .wheel-bg {
             width: 100%; height: 100%; border-radius: 50%;
             background: conic-gradient(var(--green) 0deg, var(--green) calc(var(--chance) * 3.6deg), var(--red) calc(var(--chance) * 3.6deg), var(--red) 360deg);
@@ -69,7 +67,6 @@
         .wheel-inner-chance { font-size: 24px; font-weight: bold; color: var(--gold); }
         .wheel-inner-text { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
         
-        /* Сама стрелка */
         .wheel-arrow {
             position: absolute; top: 50%; left: 50%; width: 4px; height: 50%;
             background: var(--gold); z-index: 10; transform-origin: bottom center;
@@ -96,7 +93,6 @@
         .btn-upgrade { width: 100%; background: linear-gradient(90deg, #6a5acd, #8a2be2); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: auto; box-shadow: 0 4px 15px rgba(138,43,226,0.3);}
         .btn-upgrade:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
 
-        /* Модалка выбора */
         .modal-select { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; flex-direction: column; padding: 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
         .modal-select.active { display: flex; }
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
@@ -106,7 +102,6 @@
         .select-item img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px;}
         .close-modal-btn { background: var(--bg-card); color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: auto; cursor: pointer;}
 
-        /* Кейсы */
         #screen-inside-case { background: var(--bg-main); position: relative; display: none; flex-direction: column; justify-content: space-between; }
         #screen-inside-case.active { display: flex; }
         .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 20px 0; }
@@ -155,28 +150,29 @@
 
     <audio id="sound-spin" src="spin.mp3" preload="auto"></audio>
     <audio id="sound-win" src="win.mp3" preload="auto"></audio>
+    <!-- ОБНОВЛЕННЫЙ ЗВУК КЛИКА -->
+    <audio id="sound-click" src="button-click-short-ringing-close-dry.mp3" preload="auto"></audio>
 
     <div class="header">
-        <button class="logo-btn glass-effect" onclick="switchScreen('games')">
+        <button class="logo-btn glass-effect" onclick="switchScreen('games'); playClick()">
             Banana<span>Gift</span>
         </button>
         <div class="header-right">
             <div class="balance"><span>⭐</span> <span id="user-balance">0</span></div>
-            <button class="top-up-btn glass-effect" onclick="tg.showAlert('Скоро!')">Пополнить</button>
+            <button class="top-up-btn glass-effect" onclick="tg.showAlert('Скоро!'); playClick()">Пополнить</button>
         </div>
     </div>
 
-    <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="screen-games" class="screen active">
         <div class="case-list">
             <h2 style="margin-top:0;">Игры</h2>
-            <div class="case-card glass-effect" onclick="switchScreen('free-cases')">
+            <div class="case-card glass-effect" onclick="switchScreen('free-cases'); playClick()">
                 <div class="case-header">
                     <div class="case-icon">🎁</div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатно</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">2 кейса доступно</p></div>
                 </div>
             </div>
-            <div class="case-card glass-effect" onclick="switchScreen('upgrader')">
+            <div class="case-card glass-effect" onclick="switchScreen('upgrader'); playClick()">
                 <div class="case-header">
                     <div class="case-icon">🔄</div>
                     <div><h3 style="margin:0 0 5px 0; font-size: 18px;">Апгрейдер</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Улучши свой инвентарь</p></div>
@@ -185,39 +181,36 @@
         </div>
     </div>
 
-    <!-- АПГРЕЙДЕР -->
     <div id="screen-upgrader" class="screen">
         <div class="top-nav-case">
-            <button class="icon-btn glass-effect" onclick="switchScreen('games')">← Назад</button>
+            <button class="icon-btn glass-effect" onclick="switchScreen('games'); playClick()">← Назад</button>
         </div>
         <div class="upgrader-container">
-            <!-- Колесо (теперь стрелка крутится) -->
             <div class="wheel-wrapper">
                 <div class="wheel-bg" id="upgrade-wheel" style="--chance: 0;"></div>
                 <div class="wheel-inner">
                     <div class="wheel-inner-chance" id="upgrade-chance">0%</div>
                     <div class="wheel-inner-text">Шанс</div>
                 </div>
-                <!-- Стрелка -->
                 <div class="wheel-arrow" id="spin-arrow"></div>
             </div>
 
             <div class="upgrade-selectors">
-                <div class="selector-box glass-effect" onclick="openSelectModal('my')">
+                <div class="selector-box glass-effect" onclick="openSelectModal('my'); playClick()">
                     <div class="selector-title">Ваш подарок</div>
                     <div class="selector-content" id="my-item-content">Выбрать</div>
                 </div>
-                <div class="selector-box glass-effect" onclick="openSelectModal('target')">
+                <div class="selector-box glass-effect" onclick="openSelectModal('target'); playClick()">
                     <div class="selector-title">Хочу получить</div>
                     <div class="selector-content" id="target-item-content">Выбрать</div>
                 </div>
             </div>
 
             <div class="multipliers">
-                <button class="mult-btn glass-effect" onclick="setMultiplier(1.5, this)">x1.5</button>
-                <button class="mult-btn glass-effect" onclick="setMultiplier(2, this)">x2</button>
-                <button class="mult-btn glass-effect" onclick="setMultiplier(4, this)">x4</button>
-                <button class="mult-btn glass-effect" onclick="setMultiplier(8, this)">x8</button>
+                <button class="mult-btn glass-effect" onclick="setMultiplier(1.5, this); playClick()">x1.5</button>
+                <button class="mult-btn glass-effect" onclick="setMultiplier(2, this); playClick()">x2</button>
+                <button class="mult-btn glass-effect" onclick="setMultiplier(4, this); playClick()">x4</button>
+                <button class="mult-btn glass-effect" onclick="setMultiplier(8, this); playClick()">x8</button>
             </div>
 
             <button class="btn-upgrade glass-effect" id="btn-do-upgrade" onclick="doUpgrade()">Улучшить</button>
@@ -227,20 +220,20 @@
     <div id="screen-free-cases" class="screen">
         <div class="case-list">
             <h2 style="margin-top:0;">Бесплатные кейсы</h2>
-            <div class="case-card glass-effect" onclick="openInsideCase('sub')">
+            <div class="case-card glass-effect" onclick="openInsideCase('sub'); playClick()">
                 <div class="case-header"><div class="case-icon">⭐</div><div><h3 style="margin:0 0 5px 0; font-size: 18px;">За подписку</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">Раз в 24 часа</p></div></div>
             </div>
-            <div class="case-card glass-effect" onclick="openInsideCase('nft')">
+            <div class="case-card glass-effect" onclick="openInsideCase('nft'); playClick()">
                 <div class="case-header"><div class="case-icon">🎁</div><div><h3 style="margin:0 0 5px 0; font-size: 18px;">Бесплатный NFT</h3><p style="margin:0; font-size:13px; color:var(--text-muted);">1 раз (5 друзей для вывода)</p></div></div>
             </div>
-            <button class="btn-roll-big glass-effect" onclick="switchScreen('games')" style="background:var(--bg-card); margin-top:10px; font-size: 16px;">Назад</button>
+            <button class="btn-roll-big glass-effect" onclick="switchScreen('games'); playClick()" style="background:var(--bg-card); margin-top:10px; font-size: 16px;">Назад</button>
         </div>
     </div>
 
     <div id="screen-inside-case" class="screen">
         <div class="top-nav-case">
-            <button class="icon-btn glass-effect" onclick="switchScreen('free-cases')">← Назад</button>
-            <button class="icon-btn glass-effect" onclick="openPrizes()">🎁 Призы</button>
+            <button class="icon-btn glass-effect" onclick="switchScreen('free-cases'); playClick()">← Назад</button>
+            <button class="icon-btn glass-effect" onclick="openPrizes(); playClick()">🎁 Призы</button>
         </div>
         <div class="live-roulette-area">
             <div class="live-line"></div>
@@ -249,10 +242,10 @@
         <div class="case-title-area"><h2 id="inside-case-title">Кейс</h2></div>
         <div class="bottom-panel">
             <div class="bottom-row">
-                <button class="btn-secondary glass-effect" onclick="tg.showAlert('Скоро!')">⚙️ Настройки</button>
-                <button class="btn-secondary glass-effect" onclick="openPrizes()">🎁 Призы</button>
+                <button class="btn-secondary glass-effect" onclick="tg.showAlert('Скоро!'); playClick()">⚙️ Настройки</button>
+                <button class="btn-secondary glass-effect" onclick="openPrizes(); playClick()">🎁 Призы</button>
             </div>
-            <button class="btn-roll-big glass-effect" id="btn-roll-inside" onclick="handleRollClick()">Крутить</button>
+            <button class="btn-roll-big glass-effect" id="btn-roll-inside" onclick="handleRollClick(); playClick()">Крутить</button>
         </div>
     </div>
 
@@ -280,13 +273,13 @@
     <div id="modal-select" class="modal-select">
         <div class="modal-title" id="modal-select-title">Выберите подарок</div>
         <div class="select-grid" id="select-grid-container"></div>
-        <button class="close-modal-btn glass-effect" onclick="closeSelectModal()">Отмена</button>
+        <button class="close-modal-btn glass-effect" onclick="closeSelectModal(); playClick()">Отмена</button>
     </div>
 
     <div id="prizes-modal">
         <div class="prizes-header">
             <h3 style="margin:0;">Содержимое кейса</h3>
-            <button style="background:none; border:none; color:white; font-size:24px; cursor:pointer; padding: 10px;" onclick="closePrizes()">✕</button>
+            <button style="background:none; border:none; color:white; font-size:24px; cursor:pointer; padding: 10px;" onclick="closePrizes(); playClick()">✕</button>
         </div>
         <div class="prizes-grid" id="prizes-grid-container"></div>
     </div>
@@ -303,16 +296,16 @@
                 <p style="font-size:12px; margin:0; font-weight:bold;"><span id="win-ref-count">0</span> / 5</p>
             </div>
             <p id="win-desc" style="font-size:13px; color:var(--text-muted); margin-top:15px;"></p>
-            <button class="btn-action glass-effect" id="win-btn" onclick="closeWinModal()" style="margin-top:20px; background:var(--accent); color:white; border:none; padding:16px; border-radius:15px; font-weight:bold; width:100%; font-size:16px; cursor:pointer;">Закрыть</button>
+            <button class="btn-action glass-effect" id="win-btn" onclick="closeWinModal(); playClick()" style="margin-top:20px; background:var(--accent); color:white; border:none; padding:16px; border-radius:15px; font-weight:bold; width:100%; font-size:16px; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item glass-effect active" onclick="switchScreen('games')"><i>🎮</i>Игры</div>
-        <div class="nav-item glass-effect"><i>🎁</i>Конкурсы</div>
-        <div class="nav-item glass-effect"><i>📋</i>Задания</div>
-        <div class="nav-item glass-effect"><i>🏆</i>Турнир</div>
-        <div class="nav-item glass-effect" onclick="switchScreen('profile')"><i>👤</i>Профиль</div>
+        <div class="nav-item glass-effect active" onclick="switchScreen('games'); playClick()"><i>🎮</i>Игры</div>
+        <div class="nav-item glass-effect" onclick="playClick()"><i>🎁</i>Конкурсы</div>
+        <div class="nav-item glass-effect" onclick="playClick()"><i>📋</i>Задания</div>
+        <div class="nav-item glass-effect" onclick="playClick()"><i>🏆</i>Турнир</div>
+        <div class="nav-item glass-effect" onclick="switchScreen('profile'); playClick()"><i>👤</i>Профиль</div>
     </div>
 
     <script>
@@ -324,11 +317,21 @@
             document.getElementById('profile-id').innerText = user.id;
         }
 
+        // --- ЗВУКИ ---
         const soundSpin = document.getElementById('sound-spin');
         const soundWin = document.getElementById('sound-win');
+        const soundClick = document.getElementById('sound-click');
+
         function playSpinSound() { soundSpin.currentTime = 0; soundSpin.play().catch(e => {}); }
         function stopSpinSound() { soundSpin.pause(); soundSpin.currentTime = 0; }
         function playWinSound() { soundWin.currentTime = 0; soundWin.play().catch(e => {}); }
+        
+        // Функция клика
+        function playClick() { 
+            soundClick.currentTime = 0; 
+            soundClick.volume = 0.5; // Громкость клика
+            soundClick.play().catch(e => {}); 
+        }
 
         let myReferrals = 0; const neededReferrals = 5;
         let hasNft = false; let wonNftData = null; 
@@ -370,7 +373,7 @@
                         div.onclick = () => { 
                             selectedMyItem = { ...prize, invIndex: index };
                             document.getElementById('my-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
-                            calculateChance(); closeSelectModal(); 
+                            calculateChance(); closeSelectModal(); playClick(); 
                         };
                         div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
                         container.appendChild(div);
@@ -391,7 +394,7 @@
                         div.onclick = () => { 
                             selectedTargetItem = prize;
                             document.getElementById('target-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
-                            calculateChance(); closeSelectModal(); 
+                            calculateChance(); closeSelectModal(); playClick(); 
                         };
                         div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
                         container.appendChild(div);
@@ -448,9 +451,7 @@
             let chance = (selectedMyItem.price / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
 
-            // Решаем судьбу ДО анимации
             const isSuccess = Math.random() * 100 <= chance;
-            
             const btn = document.getElementById('btn-do-upgrade');
             const arrow = document.getElementById('spin-arrow');
             
@@ -458,24 +459,16 @@
             btn.innerText = "Крутим...";
             playSpinSound();
 
-            // Вычисляем, куда должна встать стрелка
             let targetAngle = 0;
             if (isSuccess) {
-                // Если успех, стрелка должна встать в ЗЕЛЕНЫЙ сектор (от 0 до chance)
-                // Берем случайный угол внутри зеленого сектора
                 targetAngle = Math.random() * (chance * 3.6);
             } else {
-                // Если проигрыш, стрелка должна встать в КРАСНЫЙ сектор (от chance до 100)
-                // Берем случайный угол внутри красного сектора
                 let redStartAngle = chance * 3.6;
                 let redEndAngle = 360;
                 targetAngle = redStartAngle + Math.random() * (redEndAngle - redStartAngle);
             }
 
-            // Стрелка изначально смотрит вверх (0 градусов). 
-            // Чтобы крутить по часовой стрелке, делаем несколько оборотов + целевой угол
             const totalRotation = 360 * 5 + targetAngle;
-
             arrow.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
             arrow.style.transform = `translate(-50%, -100%) rotate(${totalRotation}deg)`;
 
@@ -505,7 +498,6 @@
                 document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
                 calculateChance();
                 
-                // Возвращаем стрелку в исходное положение
                 arrow.style.transition = 'none';
                 arrow.style.transform = 'translate(-50%, -100%) rotate(0deg)';
                 
