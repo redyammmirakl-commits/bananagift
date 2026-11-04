@@ -81,11 +81,19 @@
         }
 
         .upgrade-selectors { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; align-items: stretch; }
-        .selector-box { flex: 1; background: var(--bg-card); border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent; min-height: 90px;}
+        .selector-box { flex: 1; background: var(--bg-card); border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent; min-height: 90px; position: relative;}
         .selector-box.active { border-color: var(--accent); }
         .selector-title { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; text-align: center;}
         .selector-content { font-size: 13px; font-weight: bold; text-align: center; display: flex; flex-direction: column; align-items: center;}
         .selector-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px;}
+
+        /* Кнопка добавления звезд */
+        .add-stars-btn {
+            position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: white; border: none; padding: 5px 10px;
+            border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 5; white-space: nowrap;
+        }
 
         .multipliers { display: flex; gap: 8px; width: 100%; margin-bottom: 20px; justify-content: space-between;}
         .mult-btn { flex: 1; background: var(--bg-card); border: none; color: white; padding: 12px 0; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s;}
@@ -94,6 +102,7 @@
         .btn-upgrade { width: 100%; background: linear-gradient(90deg, #6a5acd, #8a2be2); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: auto; box-shadow: 0 4px 15px rgba(138,43,226,0.3);}
         .btn-upgrade:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
 
+        /* Модалка выбора */
         .modal-select { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; flex-direction: column; padding: 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
         .modal-select.active { display: flex; }
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
@@ -149,7 +158,6 @@
         .inv-item img { width: 80px; height: 80px; object-fit: contain; }
         .inv-item .lock { position: absolute; top: 10px; right: 10px; font-size: 18px; }
         
-        /* Кнопка продажи */
         .btn-sell {
             margin-top: 10px; background: var(--bg-panel); color: var(--gold); border: 1px solid #333;
             padding: 8px; border-radius: 10px; font-size: 12px; font-weight: bold; width: 100%; cursor: pointer;
@@ -268,9 +276,10 @@
             </div>
 
             <div class="upgrade-selectors">
-                <div class="selector-box glass-effect" onclick="openSelectModal('my'); playClick()">
+                <div class="selector-box glass-effect" onclick="openSelectModal('my'); playClick()" id="box-my">
                     <div class="selector-title">Ваш подарок</div>
                     <div class="selector-content" id="my-item-content">Выбрать</div>
+                    <button class="add-stars-btn glass-effect" id="btn-add-stars" onclick="event.stopPropagation(); addStarsToUpgrade(); playClick()">+ Звезды</button>
                 </div>
                 <div class="selector-box glass-effect" onclick="openSelectModal('target'); playClick()">
                     <div class="selector-title">Хочу получить</div>
@@ -342,8 +351,15 @@
         </div>
     </div>
 
+    <!-- МОДАЛКА ВЫБОРА ДЛЯ АПГРЕЙДА -->
     <div id="modal-select" class="modal-select">
         <div class="modal-title" id="modal-select-title">Выберите подарок</div>
+        
+        <!-- Кнопка выбора звезд (появляется только для "Ваш подарок") -->
+        <div id="select-stars-btn" style="display:none; background: var(--accent); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 15px; cursor: pointer; font-weight: bold; font-size: 16px;" onclick="selectStarsItem(); playClick()">
+            ⭐ Выбрать звезды с баланса
+        </div>
+
         <div class="select-grid" id="select-grid-container"></div>
         <button class="close-modal-btn glass-effect" onclick="closeSelectModal(); playClick()">Отмена</button>
     </div>
@@ -415,6 +431,26 @@
         let myInventory = []; 
         let totalInventoryValue = 0;
         let selectedMyItem = null; let selectedTargetItem = null;
+        
+        let starsAddedToUpgrade = 0; // Сколько звезд добавили к апгрейду
+
+        // ВСЕ ДОСТУПНЫЕ ДЛЯ АПГРЕЙДА NFT
+        const allNftPrizes = [
+            { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', price: 5000 },
+            { id: 'signet', name: 'Signet Ring', img: 'Без названия116_20261104163406.png', price: 5300 },
+            { id: 'cake', name: 'Homemade Cake', img: 'Без названия115_20261104041817.png', price: 546 },
+            { id: 'vbox', name: 'Valentine Box', img: 'Без названия117_20261104163651.png', price: 1000 },
+            { id: 'santa', name: 'Santa Hat', img: 'Без названия119_20261104164244.png', price: 740 },
+            { id: 'bunny', name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', price: 740 },
+            { id: 'moon', name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', price: 520 }, // Новая иконка
+            { id: 'sword', name: 'Light Sword', img: 'Без названия122_20261104165019.png', price: 520 },
+            { id: 'liberty', name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', price: 440 },
+            { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', price: 440 },
+            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', price: 370 },
+            { id: 'socks', name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', price: 370 },
+            { id: 'flame', name: 'Chill Flame', img: 'Без названия109_20261104034940.png', price: 370 },
+            { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', price: 370 }
+        ].sort((a, b) => a.price - b.price);
 
         const nftPrizes = [
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 70, price: 440 },
@@ -428,13 +464,12 @@
         
         const subCasePrizes = nftPrizes.filter(p => p.id !== 'cat');
 
-        // Призы для кейса Ring
         const ringCasePrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.5, price: 5300 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1.5, price: 1000 },
             { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 2.5, price: 740 },
             { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 4, price: 740 },
-            { name: 'Moon Pendant', img: 'Без названия120_20261104164450.jpeg', chance: 5, price: 520 },
+            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 5, price: 520 }, // Новая иконка
             { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 8, price: 520 },
             { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 10, price: 440 },
             { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 15, price: 440 },
@@ -502,7 +537,7 @@
                 ]
             }, function(res) {
                 if (res === 'yes') {
-                    donateBalance += item.price; // Звезды начисляются на донатный баланс
+                    donateBalance += item.price; 
                     totalInventoryValue -= item.price;
                     myInventory.splice(index, 1);
                     
@@ -518,19 +553,20 @@
         // --- АПГРЕЙД ЛОГИКА ---
         function openSelectModal(type) {
             const container = document.getElementById('select-grid-container');
+            const starsBtn = document.getElementById('select-stars-btn');
             container.innerHTML = '';
             const modal = document.getElementById('modal-select');
             
             if (type === 'my') {
                 document.getElementById('modal-select-title').innerText = 'Выберите свой подарок';
+                starsBtn.style.display = 'block'; // Показываем кнопку звезд
                 
-                // Берем только разблокированные предметы
                 let availableItems = myInventory.filter((item, index) => {
                     return !item.isLocked; 
                 });
 
                 if (availableItems.length === 0) {
-                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков для улучшения</p>';
+                    container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет доступных подарков (или все заблокированы)</p>';
                 } else {
                     availableItems.forEach((prize) => {
                         const originalIndex = myInventory.findIndex(i => i.uniqueId === prize.uniqueId);
@@ -538,7 +574,9 @@
                         div.className = 'select-item';
                         div.onclick = () => { 
                             selectedMyItem = { ...prize, invIndex: originalIndex };
-                            document.getElementById('my-item-content').innerHTML = `<img src="${prize.img}" class="selector-img">${prize.name}`;
+                            starsAddedToUpgrade = 0; // Сбрасываем добавленные звезды
+                            document.getElementById('btn-add-stars').style.display = 'block'; // Показываем кнопку "+ Звезды"
+                            updateMyItemDisplay();
                             calculateChance(); closeSelectModal(); playClick(); 
                         };
                         div.innerHTML = `<img src="${prize.img}"><div style="font-size:12px; font-weight:bold; margin-bottom:5px;">${prize.name}</div><div style="color:var(--gold); font-size:12px;">${prize.price} ⭐</div>`;
@@ -546,10 +584,11 @@
                     });
                 }
             } else {
+                starsBtn.style.display = 'none'; // Прячем кнопку звезд
                 document.getElementById('modal-select-title').innerText = 'Выберите желаемый подарок';
-                let availableTargets = nftPrizes;
+                let availableTargets = allNftPrizes;
                 if (selectedMyItem) {
-                    availableTargets = nftPrizes.filter(p => p.price > selectedMyItem.price);
+                    availableTargets = allNftPrizes.filter(p => p.price > (selectedMyItem.price + starsAddedToUpgrade));
                 }
                 if (availableTargets.length === 0) {
                     container.innerHTML = '<p style="grid-column: span 2; text-align:center; color:var(--text-muted);">Нет предметов дороже вашего</p>';
@@ -570,6 +609,80 @@
             modal.classList.add('active');
         }
 
+        // Функция выбора звезд вместо NFT
+        function selectStarsItem() {
+            let balance = donateBalance + bonusBalance;
+            if (balance <= 0) { tg.showAlert("У вас нет звезд на балансе!"); return; }
+            
+            // Спрашиваем, сколько звезд вложить
+            tg.showPopup({
+                title: 'Ввод звезд',
+                message: `Сколько звезд использовать? (Доступно: ${balance})`,
+                buttons: [
+                    {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                ]
+            });
+            
+            // Так как Telegram WebApp не поддерживает текстовый ввод в попапе, 
+            // мы используем prompt браузера (он работает на iOS и Android)
+            let amount = prompt(`Введите количество звезд (Доступно: ${balance}):`, "100");
+            if (amount === null) return; // Отмена
+            amount = parseInt(amount);
+            
+            if (isNaN(amount) || amount <= 0) {
+                tg.showAlert("Введите корректное число!"); return;
+            }
+            if (amount > balance) {
+                tg.showAlert("Недостаточно звезд на балансе!"); return;
+            }
+
+            selectedMyItem = {
+                name: `${amount} Stars`,
+                img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png',
+                price: amount,
+                isStarsOnly: true
+            };
+            starsAddedToUpgrade = 0;
+            document.getElementById('btn-add-stars').style.display = 'none'; // Скрываем кнопку добавить звезды
+            updateMyItemDisplay();
+            calculateChance();
+            closeSelectModal();
+        }
+
+        // Добавление звезд к выбранному NFT
+        function addStarsToUpgrade() {
+            if (!selectedMyItem || selectedMyItem.isStarsOnly) return;
+            
+            let balance = donateBalance + bonusBalance;
+            if (balance <= 0) { tg.showAlert("У вас нет звезд на балансе!"); return; }
+
+            let amount = prompt(`Сколько звезд добавить к ${selectedMyItem.name}? (Доступно: ${balance})`, "50");
+            if (amount === null) return;
+            amount = parseInt(amount);
+
+            if (isNaN(amount) || amount <= 0) {
+                tg.showAlert("Введите корректное число!"); return;
+            }
+            if (amount > balance) {
+                tg.showAlert("Недостаточно звезд на балансе!"); return;
+            }
+
+            starsAddedToUpgrade += amount;
+            updateMyItemDisplay();
+            calculateChance();
+        }
+
+        function updateMyItemDisplay() {
+            if (selectedMyItem.isStarsOnly) {
+                document.getElementById('my-item-content').innerHTML = `<img src="${selectedMyItem.img}" class="selector-img">${selectedMyItem.price} ⭐`;
+            } else {
+                let totalPrice = selectedMyItem.price + starsAddedToUpgrade;
+                let text = selectedMyItem.name;
+                if (starsAddedToUpgrade > 0) text += ` + ${starsAddedToUpgrade} ⭐`;
+                document.getElementById('my-item-content').innerHTML = `<img src="${selectedMyItem.img}" class="selector-img">${text}`;
+            }
+        }
+
         function closeSelectModal() { document.getElementById('modal-select').classList.remove('active'); }
 
         function setMultiplier(mult, btnElement) {
@@ -577,12 +690,13 @@
             document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
             
-            let targetPrice = selectedMyItem.price * mult;
+            let currentPrice = selectedMyItem.price + starsAddedToUpgrade;
+            let targetPrice = currentPrice * mult;
             let closestPrize = null;
             let minDiff = Infinity;
             
-            nftPrizes.forEach(p => {
-                if (p.price > selectedMyItem.price) {
+            allNftPrizes.forEach(p => {
+                if (p.price > currentPrice) {
                     let diff = Math.abs(p.price - targetPrice);
                     if (diff < minDiff) { minDiff = diff; closestPrize = p; }
                 }
@@ -603,7 +717,9 @@
                 btn.disabled = true;
                 return;
             }
-            let chance = (selectedMyItem.price / selectedTargetItem.price) * 100;
+            
+            let totalMyPrice = selectedMyItem.price + starsAddedToUpgrade;
+            let chance = (totalMyPrice / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
             
             document.getElementById('upgrade-chance').innerText = chance.toFixed(1) + '%';
@@ -614,7 +730,8 @@
         function doUpgrade() {
             if (!selectedMyItem || !selectedTargetItem) return;
 
-            let chance = (selectedMyItem.price / selectedTargetItem.price) * 100;
+            let totalMyPrice = selectedMyItem.price + starsAddedToUpgrade;
+            let chance = (totalMyPrice / selectedTargetItem.price) * 100;
             if (chance > 100) chance = 100;
 
             const isSuccess = Math.random() * 100 <= chance;
@@ -642,9 +759,26 @@
                 stopSpinSound();
                 playWinSound();
 
-                const invIndex = selectedMyItem.invIndex;
-                totalInventoryValue -= myInventory[invIndex].price;
-                myInventory.splice(invIndex, 1);
+                // Списываем звезды с баланса, если они использовались
+                let starsToSpend = starsAddedToUpgrade;
+                if (selectedMyItem.isStarsOnly) starsToSpend += selectedMyItem.price;
+                
+                if (starsToSpend > 0) {
+                    if (donateBalance >= starsToSpend) {
+                        donateBalance -= starsToSpend;
+                    } else {
+                        let remainder = starsToSpend - donateBalance;
+                        donateBalance = 0;
+                        bonusBalance -= remainder;
+                    }
+                    updateUI();
+                }
+
+                // Удаляем предмет, если он был
+                if (!selectedMyItem.isStarsOnly) {
+                    totalInventoryValue -= myInventory[selectedMyItem.invIndex].price;
+                    myInventory.splice(selectedMyItem.invIndex, 1);
+                }
 
                 if (isSuccess) {
                     myInventory.push({...selectedTargetItem, uniqueId: Date.now() + Math.random(), isLocked: false});
@@ -659,8 +793,10 @@
                 
                 selectedMyItem = null;
                 selectedTargetItem = null;
+                starsAddedToUpgrade = 0;
                 document.getElementById('my-item-content').innerText = 'Выбрать';
                 document.getElementById('target-item-content').innerText = 'Выбрать';
+                document.getElementById('btn-add-stars').style.display = 'none';
                 document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
                 calculateChance();
                 
@@ -683,9 +819,7 @@
             }
 
             myInventory.forEach((item, index) => {
-                // Показываем кнопку продажи только если предмет НЕ заблокирован
                 const sellBtn = !item.isLocked ? `<button class="btn-sell glass-effect" onclick="sellNft(${index})">Продать</button>` : '';
-                
                 invContainer.innerHTML += `
                     <div class="inv-item">
                         <img src="${item.img}"> ${item.isLocked ? '<div class="lock">🔒</div>' : ''}
@@ -866,7 +1000,7 @@
                 if (!winItem.isStar) {
                     winItem.isNft = true;
                     winItem.uniqueId = Date.now() + Math.random();
-                    winItem.isLocked = false; // ИЗ ПЛАТНОГО КЕЙСА БЕЗ ЗАМКА
+                    winItem.isLocked = false; 
                 } else {
                     winItem.isNft = false;
                     winItem.amount = winItem.price; 
@@ -969,7 +1103,6 @@
                 document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
                 document.getElementById('win-desc').innerText = ''; 
                 
-                // ЕСЛИ ПРЕДМЕТ ИЗ ПЛАТНОГО КЕЙСА - НЕ ПОКАЗЫВАЕМ ЗАМОК
                 if (item.isLocked) {
                     document.getElementById('ref-block').style.display = 'block';
                 } else {
