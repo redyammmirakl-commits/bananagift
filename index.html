@@ -133,13 +133,19 @@
         
         .slots-result-text { font-size: 24px; font-weight: bold; color: white; text-align: center; margin-bottom: 20px; display: none;}
 
-        /* РУЛЕТКА КЕЙСА */
+        /* РУЛЕТКА КЕЙСА (ЖИВАЯ) */
         .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 10px;}
         .roulette-row { position: relative; width: 100%; height: 70px; overflow: hidden; display: flex; align-items: center; }
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--purple); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--purple); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
         .live-item { width: 60px; height: 60px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
+
+        /* Анимация бесконечной прокрутки (для фона) */
+        @keyframes scrollBg {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
 
         #multicast-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -554,7 +560,7 @@
         function playWinSound() { soundWin.currentTime = 0; soundWin.play().catch(e => {}); }
         function playClick() { soundClick.currentTime = 0; soundClick.volume = 0.5; soundClick.play().catch(e => {}); }
 
-        let myReferrals = 0; const neededReferrals = 2; // Теперь нужно 2 друга
+        let myReferrals = 0; const neededReferrals = 2; 
         let hasNft = false; let wonNftData = null; 
         let donateBalance = 0; let bonusBalance = 0;   
         let currentCaseType = 'nft'; 
@@ -573,7 +579,6 @@
         let contractItems = [null, null, null, null, null];
         let selectingContractSlotIndex = -1;
 
-        // Флаг, пополнил ли человек баланс на 100 звезд (для разблокировки)
         let hasToppedUp100 = false;
 
         const allNftPrizes = [
@@ -640,12 +645,40 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
-        // Имитация пополнения
+        // Фоновая анимация
+        function initBackgroundAnimation() {
+            const container = document.getElementById('roulette-rows-container');
+            container.innerHTML = '';
+            
+            let source = getCurrentSource();
+            let track = document.createElement('div');
+            track.className = 'live-track';
+            track.style.animation = 'scrollBg 20s linear infinite';
+            
+            // Дублируем элементы для бесшовной прокрутки
+            for (let i = 0; i < 40; i++) {
+                track.innerHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
+            }
+            
+            const row = document.createElement('div');
+            row.className = 'roulette-row';
+            row.innerHTML = `<div class="live-line"></div>`;
+            row.appendChild(track);
+            container.appendChild(row);
+        }
+
+        function getCurrentSource() {
+            if (currentCaseType === 'sub') return subCasePrizes;
+            else if (currentCaseType === 'ring') return ringCasePrizes;
+            else if (currentCaseType === 'multicast') return multicastPrizes;
+            else return nftPrizes;
+        }
+
         function fakeTopUp(amount = 100) {
             donateBalance += amount;
             if (amount >= 100) hasToppedUp100 = true;
             updateUI();
-            updateRefUI(); // Обновляем окно выигрыша, если оно открыто
+            updateRefUI(); 
             tg.showAlert(`Баланс пополнен на ${amount} ⭐`);
         }
 
@@ -665,9 +698,7 @@
                 else topupStatusEl.classList.remove('done');
             }
 
-            // Если все условия выполнены, меняем замок на "Забрать"
             if (myReferrals >= neededReferrals && hasToppedUp100 && wonNftData) {
-                // Разблокируем предмет в инвентаре
                 const itemInInv = myInventory.find(i => i.uniqueId === wonNftData.uniqueId);
                 if (itemInInv && itemInInv.isLocked) {
                     itemInInv.isLocked = false;
@@ -854,7 +885,6 @@
             modal.style.display = 'flex';
         }
 
-        // --- ОСТАЛЬНОЕ ---
         function openSelectModal(type) {
             const container = document.getElementById('select-grid-container');
             const starsBtn = document.getElementById('select-stars-btn');
@@ -1072,7 +1102,7 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('free-cases');
             document.getElementById('inside-case-title').innerText = (type === 'sub') ? "За подписку" : "Бесплатный NFT";
             updateInsideCaseButton();
-            document.getElementById('roulette-rows-container').innerHTML = '';
+            initBackgroundAnimation(); // Запускаем фоновую анимацию
         }
 
         function openPaidCase(type) {
@@ -1081,7 +1111,7 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
             document.getElementById('inside-case-title').innerText = (type === 'ring') ? "Кейс Ring" : "Multicast Case";
             updateInsideCaseButton();
-            document.getElementById('roulette-rows-container').innerHTML = '';
+            initBackgroundAnimation(); // Запускаем фоновую анимацию
         }
 
         function updateInsideCaseButton() {
@@ -1224,12 +1254,7 @@
         }
 
         function getRandomPrize() {
-            let source;
-            if (currentCaseType === 'sub') source = subCasePrizes;
-            else if (currentCaseType === 'ring') source = ringCasePrizes;
-            else if (currentCaseType === 'multicast') source = multicastPrizes;
-            else source = nftPrizes;
-
+            let source = getCurrentSource();
             const rand = Math.random() * 100; let cumulative = 0;
             let winItem = source[source.length - 1];
             for (let p of source) { cumulative += p.chance; if (rand <= cumulative) { winItem = p; break; } }
@@ -1278,11 +1303,7 @@
                 let track = document.getElementById(`track-${index + 1}`);
                 let rowDiv = document.getElementById(`row-${index + 1}`);
                 
-                let source;
-                if (currentCaseType === 'sub') source = subCasePrizes;
-                else if (currentCaseType === 'ring') source = ringCasePrizes;
-                else if (currentCaseType === 'multicast') source = multicastPrizes;
-                else source = nftPrizes;
+                let source = getCurrentSource();
 
                 for (let i = 0; i < 60; i++) { 
                     track.innerHTML += `<div class="live-item"><img src="${source[Math.floor(Math.random() * source.length)].img}"></div>`; 
@@ -1341,7 +1362,10 @@
             
             isAnimating = false;
             updateInsideCaseButton();
-            setTimeout(() => playWinSound(), 500);
+            setTimeout(() => {
+                playWinSound();
+                initBackgroundAnimation(); // Возвращаем фоновую анимацию
+            }, 500);
         }
 
         function skipAllAnimations() {
@@ -1387,7 +1411,6 @@
                 document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
                 document.getElementById('win-desc').innerText = ''; 
                 
-                // Показываем условия
                 if (item.isLocked) {
                     document.getElementById('ref-block').style.display = 'block';
                     updateRefUI();
@@ -1435,11 +1458,7 @@
         function openPrizes() {
             const container = document.getElementById('prizes-grid-container');
             container.innerHTML = '';
-            let source;
-            if (currentCaseType === 'sub') source = subCasePrizes;
-            else if (currentCaseType === 'ring') source = ringCasePrizes;
-            else if (currentCaseType === 'multicast') source = multicastPrizes;
-            else source = nftPrizes;
+            let source = getCurrentSource();
 
             const sortedPrizes = [...source].sort((a, b) => b.price - a.price);
             sortedPrizes.forEach(prize => {
