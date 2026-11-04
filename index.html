@@ -246,25 +246,24 @@
             border: 2px dashed #444; font-size: 24px; color: #444; transition: all 0.5s ease;
         }
         .contract-slot img { width: 80%; height: 80%; object-fit: contain; transition: all 0.5s ease;}
-        .contract-slot.filled { border: 2px solid var(--accent); background: var(--bg-card);}
 
-        /* Анимация слияния */
-        .merge-active .contract-slot {
-            position: absolute; top: 0; left: 50%;
-            transform: translate(-50%, 0) scale(0.5);
-            opacity: 0;
+        /* Визуализация анимации: предметы слетаются в центр */
+        .flying-item {
+            position: fixed; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;
+            background: var(--bg-card); border-radius: 15px; z-index: 1000; pointer-events: none;
+            transition: all 1s cubic-bezier(0.5, -0.5, 0.5, 1.5);
         }
-        .merge-active .contract-slot:first-child {
-            opacity: 1; transform: translate(-50%, 0) scale(1); z-index: 10;
+        .flying-item img { width: 80%; height: 80%; object-fit: contain;}
+
+        /* Черный круг по центру */
+        .contract-center-circle {
+            width: 100px; height: 100px; border-radius: 50%; background: #000;
+            display: flex; justify-content: center; align-items: center; position: relative;
+            transition: background-color 0.3s, box-shadow 0.3s; z-index: 50;
+            margin: 20px auto; font-size: 40px;
         }
-        
-        .merge-result-icon {
-            width: 80px; height: 80px; border-radius: 50%; display: none;
-            justify-content: center; align-items: center; font-size: 40px;
-            margin: 0 auto; transition: all 0.5s ease;
-        }
-        .merge-success { background: var(--green); box-shadow: 0 0 30px var(--green); }
-        .merge-fail { background: var(--red); box-shadow: 0 0 30px var(--red); }
+        .contract-center-circle.success { background: var(--green); box-shadow: 0 0 30px var(--green); }
+        .contract-center-circle.fail { background: var(--red); box-shadow: 0 0 30px var(--red); }
 
         .btn-contract { background: linear-gradient(90deg, #d946ef, #8a2be2); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; margin-top: 20px;}
         .btn-contract:disabled { background: #333; cursor: not-allowed; }
@@ -343,8 +342,8 @@
                 <div class="contract-slot" id="slot-5" onclick="openSelectForContract(4)">+</div>
             </div>
 
-            <!-- Иконка для анимации слияния -->
-            <div id="merge-result-icon" class="merge-result-icon">🎁</div>
+            <!-- Черный круг по центру -->
+            <div class="contract-center-circle" id="contract-center-circle">❓</div>
 
             <button class="btn-contract glass-effect" id="btn-start-contract" onclick="startContract(); playClick()" disabled>Заключить контракт</button>
         </div>
@@ -665,7 +664,7 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
-        // Фоновая анимация
+        // Фоновая анимация (с эффектом туда-сюда)
         function initBackgroundAnimation() {
             const container = document.getElementById('roulette-rows-container');
             container.innerHTML = '';
@@ -673,7 +672,7 @@
             let source = getCurrentSource();
             let track = document.createElement('div');
             track.className = 'live-track';
-            // Добавил плавную анимацию туда-сюда (pulse)
+            // Анимация туда-сюда
             track.style.animation = 'scrollBg 20s linear infinite alternate'; 
             
             for (let i = 0; i < 40; i++) {
@@ -779,9 +778,10 @@
             document.getElementById('modal-select-title').innerText = `Выберите NFT для слота ${slotIndex + 1}`;
             starsBtn.style.display = 'none';
 
+            // ВАЖНО: Берем только разблокированные NFT, НО РАЗРЕШАЕМ брать копии (проверяем только то, что уже выбрано)
             let availableItems = myInventory.filter((item) => {
                 if (item.isLocked) return false;
-                return !contractItems.includes(item.uniqueId);
+                return true; 
             });
 
             if (availableItems.length === 0) {
@@ -791,7 +791,9 @@
                     const div = document.createElement('div');
                     div.className = 'select-item';
                     div.onclick = () => { 
-                        contractItems[slotIndex] = prize.uniqueId;
+                        // Ищем реальный индекс этого предмета в инвентаре
+                        const realIndex = myInventory.findIndex(i => i.uniqueId === prize.uniqueId);
+                        contractItems[slotIndex] = realIndex; // Сохраняем индекс
                         updateContractUI();
                         closeSelectModal(); playClick(); 
                     };
@@ -808,8 +810,8 @@
 
             for (let i = 0; i < 5; i++) {
                 const slotDiv = document.getElementById(`slot-${i + 1}`);
-                if (contractItems[i]) {
-                    const item = myInventory.find(inv => inv.uniqueId === contractItems[i]);
+                if (contractItems[i] !== null) {
+                    const item = myInventory[contractItems[i]];
                     if (item) {
                         slotDiv.innerHTML = `<img src="${item.img}">`;
                         slotDiv.classList.add('filled');
@@ -837,70 +839,138 @@
             isAnimating = true;
             document.getElementById('btn-start-contract').disabled = true;
             
-            // Визуальный эффект слияния
-            const slotsContainer = document.getElementById('contract-slots-container');
-            const resultIcon = document.getElementById('merge-result-icon');
-            slotsContainer.classList.add('merge-active');
-            resultIcon.style.display = 'flex';
-            resultIcon.className = 'merge-result-icon'; // Сброс классов
-            resultIcon.innerText = '🎁';
+            const centerCircle = document.getElementById('contract-center-circle');
+            centerCircle.className = 'contract-center-circle'; // Сброс
+            centerCircle.innerText = ''; // Убираем знак вопроса
 
+            // Собираем предметы для анимации
+            let itemsToRemoveIndices = [];
+            let itemsToAnimate = [];
             let totalValue = 0;
-            let itemsToRemove = [];
 
             for (let i = 0; i < 5; i++) {
-                if (contractItems[i]) {
-                    const item = myInventory.find(inv => inv.uniqueId === contractItems[i]);
-                    if (item) {
-                        totalValue += item.price;
-                        itemsToRemove.push(item);
-                    }
+                if (contractItems[i] !== null) {
+                    const item = myInventory[contractItems[i]];
+                    itemsToRemoveIndices.push(contractItems[i]);
+                    itemsToAnimate.push(item);
+                    totalValue += item.price;
                 }
             }
 
-            const isSuccess = Math.random() < 0.5; // 50% шанс
+            // Сортируем индексы по убыванию, чтобы удалять с конца (чтобы не сбить индексы)
+            itemsToRemoveIndices.sort((a, b) => b - a);
 
-            // Анимация (2 сек)
-            setTimeout(() => {
-                if (isSuccess) {
-                    resultIcon.classList.add('merge-success');
-                    playWinSound(); // Звук победы
-                } else {
-                    resultIcon.classList.add('merge-fail');
-                    playClick(); // Короткий клик для провала
+            // Прячем слоты
+            document.getElementById('contract-slots-container').style.visibility = 'hidden';
+
+            // Анимация полета
+            let currentIndex = 0;
+            const circleRect = centerCircle.getBoundingClientRect();
+
+            function animateNextItem() {
+                if (currentIndex >= itemsToAnimate.length) {
+                    // Все залетели, начинаем мерцание
+                    startMerging(totalValue, itemsToRemoveIndices);
+                    return;
                 }
-            }, 1000);
 
-            // Результат (3.5 сек)
-            setTimeout(() => {
-                slotsContainer.classList.remove('merge-active');
-                resultIcon.style.display = 'none';
+                const item = itemsToAnimate[currentIndex];
+                const flyEl = document.createElement('div');
+                flyEl.className = 'flying-item';
+                flyEl.innerHTML = `<img src="${item.img}">`;
                 
-                myInventory = myInventory.filter(item => !itemsToRemove.includes(item));
-                totalInventoryValue -= totalValue;
+                // Начальная позиция (из слота)
+                const slotRect = document.getElementById(`slot-${currentIndex + 1}`).getBoundingClientRect();
+                flyEl.style.left = slotRect.left + 'px';
+                flyEl.style.top = slotRect.top + 'px';
+                
+                document.body.appendChild(flyEl);
 
-                if (isSuccess) {
-                    let availablePrizes = allNftPrizes.filter(p => p.price > totalValue && p.price <= totalValue * 1.5);
-                    if (availablePrizes.length === 0) availablePrizes = allNftPrizes.filter(p => p.price > totalValue);
-                    
-                    let winItem = availablePrizes[Math.floor(Math.random() * availablePrizes.length)];
-                    if (!winItem) winItem = allNftPrizes[allNftPrizes.length - 1];
+                // Конечная позиция (в центр круга)
+                setTimeout(() => {
+                    flyEl.style.left = (circleRect.left + circleRect.width/2 - 30) + 'px';
+                    flyEl.style.top = (circleRect.top + circleRect.height/2 - 30) + 'px';
+                    flyEl.style.transform = 'scale(0.2)';
+                    flyEl.style.opacity = '0';
+                }, 50);
 
-                    myInventory.push({...winItem, uniqueId: Date.now() + Math.random(), isLocked: false});
-                    totalInventoryValue += winItem.price;
-                    
-                    showContractResult(true, winItem);
-                } else {
-                    showContractResult(false, null);
-                }
+                playClick();
 
-                contractItems = [null, null, null, null, null];
-                updateContractUI();
-                renderInventory();
-                document.getElementById('inv-price-val').innerText = totalInventoryValue;
-                updateUI();
-                isAnimating = false;
-            }, 3500);
+                setTimeout(() => {
+                    flyEl.remove();
+                    currentIndex++;
+                    animateNextItem();
+                }, 600); // Скорость полета
+            }
+
+            animateNextItem();
+
+            function startMerging(totalValue, indicesToRemove) {
+                const isSuccess = Math.random() < 0.5; // 50% шанс
+                let flickerCount = 0;
+
+                // Мерцание
+                const flickerInterval = setInterval(() => {
+                    flickerCount++;
+                    if (flickerCount > 6) {
+                        clearInterval(flickerInterval);
+                        
+                        // Финал
+                        if (isSuccess) {
+                            centerCircle.classList.add('success');
+                            centerCircle.innerText = '🎁';
+                            playWinSound();
+                        } else {
+                            centerCircle.classList.add('fail');
+                            centerCircle.innerText = '❌';
+                            playClick();
+                        }
+
+                        setTimeout(() => {
+                            // Очищаем инвентарь
+                            indicesToRemove.forEach(idx => {
+                                myInventory.splice(idx, 1);
+                            });
+                            totalInventoryValue -= totalValue;
+
+                            if (isSuccess) {
+                                let availablePrizes = allNftPrizes.filter(p => p.price > totalValue && p.price <= totalValue * 1.5);
+                                if (availablePrizes.length === 0) availablePrizes = allNftPrizes.filter(p => p.price > totalValue);
+                                
+                                let winItem = availablePrizes[Math.floor(Math.random() * availablePrizes.length)];
+                                if (!winItem) winItem = allNftPrizes[allNftPrizes.length - 1];
+
+                                myInventory.push({...winItem, uniqueId: Date.now() + Math.random(), isLocked: false});
+                                totalInventoryValue += winItem.price;
+                                
+                                showContractResult(true, winItem);
+                            } else {
+                                showContractResult(false, null);
+                            }
+
+                            contractItems = [null, null, null, null, null];
+                            document.getElementById('contract-slots-container').style.visibility = 'visible';
+                            centerCircle.className = 'contract-center-circle';
+                            centerCircle.innerText = '❓';
+                            
+                            updateContractUI();
+                            renderInventory();
+                            document.getElementById('inv-price-val').innerText = totalInventoryValue;
+                            updateUI();
+                            isAnimating = false;
+                        }, 1500);
+
+                    } else {
+                        if (flickerCount % 2 === 0) {
+                            centerCircle.classList.add('success');
+                            centerCircle.classList.remove('fail');
+                        } else {
+                            centerCircle.classList.add('fail');
+                            centerCircle.classList.remove('success');
+                        }
+                    }
+                }, 150);
+            }
         }
 
         function showContractResult(isSuccess, item) {
