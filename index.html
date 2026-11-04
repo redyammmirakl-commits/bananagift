@@ -89,8 +89,11 @@
         }
         .win-box { background: var(--card-bg); padding: 20px; border-radius: 20px; text-align: center; width: 100%; max-width: 300px; display: flex; flex-direction: column; align-items: center;}
         
-        /* ИСПРАВЛЕНО: Картинка теперь по центру */
-        .win-image { width: 120px; height: 120px; object-fit: contain; margin: 15px auto; display: block; }
+        .win-image { width: 120px; height: 120px; object-fit: contain; margin: 10px auto; display: block; }
+        
+        /* Стили для названия и цены в окне выигрыша */
+        .win-item-name { font-size: 22px; font-weight: bold; color: #fff; margin: 10px 0 5px 0; }
+        .win-item-price { font-size: 16px; color: var(--gold); font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 5px;}
         
         .inventory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px;}
         .inv-item { background: var(--card-bg); padding: 10px; border-radius: 12px; text-align: center; position: relative; }
@@ -111,7 +114,6 @@
 </head>
 <body>
 
-    <!-- Скрытые аудио-плееры -->
     <audio id="sound-spin" src="spin.mp3" preload="auto"></audio>
     <audio id="sound-win" src="win.mp3" preload="auto"></audio>
 
@@ -202,16 +204,22 @@
         <div class="prizes-grid" id="prizes-grid-container"></div>
     </div>
 
+    <!-- ОКНО ВЫИГРЫША (ОБНОВЛЕНО) -->
     <div id="win-modal">
         <div class="win-box">
-            <h2 id="win-title" style="color:var(--gold); margin-top:0;">Ты выиграл!</h2>
             
-            <!-- Картинка (теперь по центру) -->
+            <!-- Картинка приза по центру -->
             <img id="win-image" class="win-image" src="" style="display:none;">
             
-            <h3 id="win-name" style="margin:5px 0;">Приз</h3>
+            <!-- Белое название приза -->
+            <div id="win-item-name" class="win-item-name">Название</div>
             
-            <div id="ref-block" style="display:none; background:#2a2a2a; padding:10px; border-radius:10px; margin-top:10px; width:100%; box-sizing:border-box;">
+            <!-- Цена золотым -->
+            <div id="win-item-price" class="win-item-price">
+                <span>⭐</span> <span id="win-price-val">0</span>
+            </div>
+            
+            <div id="ref-block" style="display:none; background:#2a2a2a; padding:10px; border-radius:10px; margin-top:5px; width:100%; box-sizing:border-box;">
                 <p style="margin:0 0 5px 0; font-size:12px; color:var(--red);">🔒 Заблокировано!</p>
                 <p style="margin:0 0 5px 0; font-size:11px;">Приведи 5 друзей, чтобы вывести NFT.</p>
                 <div class="progress-bar" style="height:10px;">
@@ -220,7 +228,8 @@
                 <p style="font-size:10px; margin:0;"><span id="win-ref-count">0</span> / 5</p>
             </div>
 
-            <p id="win-desc" style="font-size:12px; color:#ccc; margin-top:10px;"></p>
+            <p id="win-desc" style="font-size:12px; color:#888; margin-top:15px;"></p>
+            
             <button class="btn-action" id="win-btn" onclick="closeWinModal()" style="margin-top:15px; background:var(--accent); color:white; border:none; padding:15px; border-radius:12px; font-weight:bold; width:100%;">Закрыть</button>
         </div>
     </div>
@@ -242,13 +251,12 @@
             document.getElementById('profile-id').innerText = user.id;
         }
 
-        // --- ЗВУКИ ---
         const soundSpin = document.getElementById('sound-spin');
         const soundWin = document.getElementById('sound-win');
 
         function playSpinSound() {
-            soundSpin.currentTime = 0; // Сброс на начало
-            soundSpin.play().catch(e => console.log("Звук не загружен или заблокирован"));
+            soundSpin.currentTime = 0; 
+            soundSpin.play().catch(e => console.log("Звук не загружен"));
         }
 
         function stopSpinSound() {
@@ -258,7 +266,7 @@
 
         function playWinSound() {
             soundWin.currentTime = 0;
-            soundWin.play().catch(e => console.log("Звук не загружен или заблокирован"));
+            soundWin.play().catch(e => console.log("Звук не загружен"));
         }
 
         let myReferrals = 0; 
@@ -466,7 +474,7 @@
             isSpinning = true;
             updateInsideCaseButton(); 
             stopLiveTrack();
-            playSpinSound(); // ВКЛЮЧАЕМ ЗВУК КРУЧЕНИЯ
+            playSpinSound();
 
             let winItem;
             let isWinNft = false;
@@ -542,8 +550,8 @@
             if (!isSpinning) return; 
             clearTimeout(skipTimeout);
             
-            stopSpinSound(); // ВЫКЛЮЧАЕМ ЗВУК КРУЧЕНИЯ
-            playWinSound(); // ВКЛЮЧАЕМ ЗВУК ВЫИГРЫША
+            stopSpinSound();
+            playWinSound();
 
             const computedStyle = window.getComputedStyle(liveTrack);
             const currentTransform = computedStyle.transform;
@@ -626,8 +634,11 @@
             const modal = document.getElementById('win-modal');
             document.getElementById('win-image').src = wonNftData.img;
             document.getElementById('win-image').style.display = 'block';
-            document.getElementById('win-title').innerText = 'Твой NFT:';
-            document.getElementById('win-name').innerText = wonNftData.name;
+            
+            // Обновлено для окна "Мои условия"
+            document.getElementById('win-item-name').innerText = wonNftData.name;
+            document.getElementById('win-item-price').innerHTML = `<span>⭐</span> <span>${wonNftData.price}</span>`;
+
             document.getElementById('win-desc').innerText = 'Ты уже выбил этот кейс.';
             document.getElementById('ref-block').style.display = 'block';
             
@@ -639,8 +650,8 @@
         function showWinModal(item) {
             const modal = document.getElementById('win-modal');
             const img = document.getElementById('win-image');
-            const title = document.getElementById('win-title');
-            const name = document.getElementById('win-name');
+            const nameEl = document.getElementById('win-item-name');
+            const priceEl = document.getElementById('win-item-price');
             const desc = document.getElementById('win-desc');
             const refBlock = document.getElementById('ref-block');
 
@@ -649,17 +660,24 @@
             if (item.isNft) {
                 img.src = item.img;
                 img.style.display = 'block';
-                title.innerText = 'Ты выиграл NFT!';
-                name.innerText = item.name;
-                desc.innerText = 'Он добавлен в твой инвентарь.';
+                
+                // Ставим белое имя и цену
+                nameEl.innerText = item.name;
+                priceEl.innerHTML = `<span>⭐</span> <span>${item.price}</span>`;
+                
+                desc.innerText = '';
                 refBlock.style.display = 'block';
                 
                 document.getElementById('win-ref-count').innerText = myReferrals;
                 document.getElementById('win-progress').style.width = Math.min((myReferrals / neededReferrals) * 100, 100) + '%';
             } else {
-                img.style.display = 'none';
-                title.innerText = 'Ты выиграл!';
-                name.innerText = item.name;
+                // Для звезд
+                img.src = 'https://em-content.zobj.net/source/apple/354/star_2b50.png'; // Показываем звезду
+                img.style.display = 'block';
+                
+                nameEl.innerText = item.name;
+                priceEl.innerHTML = ''; // У звезд цену не пишем
+                
                 desc.innerText = 'Зачислено на твой баланс.';
                 refBlock.style.display = 'none';
             }
