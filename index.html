@@ -600,6 +600,7 @@
 
         let hasToppedUp100 = false;
 
+        // БАЗА ВСЕХ NFT (ДЛЯ АПГРЕЙДА И КОНТРАКТОВ)
         const allNftPrizes = [
             { id: 'signet', name: 'Signet Ring', img: 'Без названия116_20261104163406.png', price: 3631 },
             { id: 'cat', name: 'Scared Cat', img: 'Без названия112_20261104035040.png', price: 27144 },
@@ -607,7 +608,7 @@
             { id: 'santa', name: 'Santa Hat', img: 'Без названия119_20261104164244.png', price: 635 },
             { id: 'bunny', name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', price: 817 },
             { id: 'perfume', name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', price: 7806 },
-            { id: 'mask', name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', price: 670 },
+            { id: 'mask', name: 'Myth Mask', img: 'Без названия127_20261104180603.png', price: 1177 }, // Изменено
             { id: 'loot', name: 'Loot Bag', img: 'Без названия125_20261104175552.png', price: 12801 },
             { id: 'snake', name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', price: 454 },
             { id: 'cigar', name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', price: 1724 },
@@ -617,14 +618,28 @@
             { id: 'sword', name: 'Light Sword', img: 'Без названия122_20261104165019.png', price: 635 },
             { id: 'liberty', name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', price: 545 },
             { id: 'lolli', name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', price: 454 },
-            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', price: 454 },
+            { id: 'cream', name: 'Vice Cream', img: 'Без названия110_20261104035001.png', price: 500 }, // Изменено
             { id: 'socks', name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', price: 545 },
             { id: 'flame', name: 'Chill Flame', img: 'Без названия109_20261104034940.png', price: 454 },
-            { id: 'stocking', name: 'Xmas Stocking', img: 'Без названия111_20261104035019.png', price: 454 }
+            { id: 'stocking', name: 'Xmas Stacking', img: 'Без названия111_20261104035019.png', price: 460 }, // Изменено
+
+            // НОВЫЕ NFT (Добавлены в базу, но не в кейсы)
+            { id: 'mirage', name: 'Mirage Lamp', img: 'Без названия131_20261105002100.png', price: 580 },
+            { id: 'snoop', name: 'Snoop Dogg', img: 'Без названия132_20261105002343.png', price: 550 },
+            { id: 'ramen', name: 'Instant Ramen', img: 'Без названия133_20261105002607.png', price: 470 },
+            { id: 'icecream', name: 'Ice Cream', img: 'Без названия134_20261105002950.png', price: 460 },
+            { id: 'float', name: 'Pool Float', img: 'Без названия135_20261105003206.png', price: 480 },
+            { id: 'mood', name: 'Mood Pack', img: 'Без названия136_20261105003408.png', price: 500 },
+            { id: 'brownie', name: 'Happy Brownie', img: 'Без названия137_20261105003622.png', price: 520 },
+            { id: 'swag', name: 'Swag Bag', img: 'Без названия139_20261105003848.png', price: 560 },
+            { id: 'cupcake', name: 'Whip Cupcake', img: 'Без названия140_20261105004125.png', price: 460 },
+            { id: 'cane', name: 'Candy Cane', img: 'Без названия141_20261105004341.png', price: 400 },
+            { id: 'papakha', name: 'Papakha', img: 'Без названия142_20261105004755.png', price: 2300 }
         ].sort((a, b) => a.price - b.price);
 
         const subCasePrizes = allNftPrizes.filter(p => p.id !== 'cat');
 
+        // КЕЙС RING (ОСТАВЛЯЕМ СТАРЫЕ)
         const ringCasePrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 3631 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1180 },
@@ -641,6 +656,7 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 12, price: 5, isStar: true }
         ];
 
+        // КЕЙС MULTICAST (ОСТАВЛЯЕМ СТАРЫЕ)
         const multicastPrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.05, price: 3631 },
             { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.01, price: 27144 },
@@ -664,11 +680,9 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
-        // ИДЕАЛЬНАЯ ФОНОВАЯ АНИМАЦИЯ
+        // Фоновая анимация
         function initBackgroundAnimation() {
             const container = document.getElementById('roulette-rows-container');
-            
-            // Очищаем полностью перед созданием новой
             container.innerHTML = '';
             
             let source = getCurrentSource();
@@ -681,10 +695,7 @@
                 elementsHTML += `<div class="live-item"><img src="${source[i % source.length].img}"></div>`;
             }
             
-            // Ставим две копии подряд
             track.innerHTML = elementsHTML + elementsHTML;
-            
-            // Принудительно включаем анимацию
             track.style.animation = 'scrollBg 20s linear infinite';
             
             const row = document.createElement('div');
