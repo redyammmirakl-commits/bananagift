@@ -134,11 +134,11 @@
         .slots-result-text { font-size: 24px; font-weight: bold; color: white; text-align: center; margin-bottom: 20px; display: none;}
 
         /* РУЛЕТКА КЕЙСА */
-        .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 15px;}
-        .roulette-row { position: relative; width: 100%; height: 80px; overflow: hidden; display: flex; align-items: center; }
+        .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 10px;}
+        .roulette-row { position: relative; width: 100%; height: 70px; overflow: hidden; display: flex; align-items: center; }
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--purple); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--purple); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
-        .live-item { width: 70px; height: 70px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+        .live-item { width: 60px; height: 60px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
         #multicast-text {
@@ -383,19 +383,8 @@
             <!-- Текст мультикаста -->
             <div id="multicast-text">MULTICAST x2</div>
 
-            <!-- Ленты кейса -->
-            <div class="roulette-row" id="row-1">
-                <div class="live-line"></div>
-                <div class="live-track" id="track-1"></div>
-            </div>
-            <div class="roulette-row" id="row-2" style="opacity: 0; pointer-events: none;">
-                <div class="live-line"></div>
-                <div class="live-track" id="track-2"></div>
-            </div>
-            <div class="roulette-row" id="row-3" style="opacity: 0; pointer-events: none;">
-                <div class="live-line"></div>
-                <div class="live-track" id="track-3"></div>
-            </div>
+            <!-- Ленты кейса (динамические) -->
+            <div id="roulette-rows-container" style="width:100%; display:flex; flex-direction:column; gap:10px;"></div>
         </div>
 
         <div class="case-title-area"><h2 id="inside-case-title">Кейс</h2></div>
@@ -529,7 +518,7 @@
             { id: 'santa', name: 'Santa Hat', img: 'Без названия119_20261104164244.png', price: 635 },
             { id: 'bunny', name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', price: 817 },
             { id: 'perfume', name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', price: 7806 },
-            { id: 'mask', name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', price: 670 }, // Цена не указана, оставил старую
+            { id: 'mask', name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', price: 670 },
             { id: 'loot', name: 'Loot Bag', img: 'Без названия125_20261104175552.png', price: 12801 },
             { id: 'snake', name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', price: 454 },
             { id: 'cigar', name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', price: 1724 },
@@ -571,29 +560,35 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
         ];
 
-        // Призы для кейса Multicast (с большим шансом на звезды)
+        // Призы для кейса Multicast (СИЛЬНО УРЕЗАННЫЕ ШАНСЫ НА ДОРОГИЕ NFT)
         const multicastPrizes = [
-            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 3631 },
-            { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 27144 },
+            // Дорогие (очень редкие)
+            { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.05, price: 3631 },
+            { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.01, price: 27144 },
+            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 0.05, price: 12801 },
+            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 0.1, price: 7806 },
+            
+            // Средние
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1180 },
-            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 1, price: 635 },
             { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1, price: 817 },
-            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 1.5, price: 7806 },
-            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 1.5, price: 12801 },
-            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 2, price: 454 },
-            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 2, price: 1724 },
-            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 2, price: 817 },
-            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 3, price: 635 },
-            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 3, price: 635 },
+            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 1.5, price: 817 },
+            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 1.5, price: 1724 },
+            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 2, price: 635 },
+            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 2.5, price: 635 },
+            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 2.5, price: 635 },
+            
+            // Дешевые
             { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 4, price: 545 },
-            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 8, price: 454 },
-            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 8, price: 454 },
-            { name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', chance: 8, price: 545 },
-            // УВЕЛИЧЕННЫЕ ШАНСЫ НА ЗВЕЗДЫ
+            { name: 'Fresh Socks', img: 'Без названия114_20261104035117.png', chance: 4, price: 545 },
+            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 5, price: 454 },
+            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 5, price: 454 },
+            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 5, price: 454 },
+
+            // Звезды (основная масса)
             { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 25, isStar: true },
             { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 20, price: 15, isStar: true },
-            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 20, price: 10, isStar: true },
-            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 19.8, price: 5, isStar: true }
+            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 10, isStar: true },
+            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 5, isStar: true }
         ];
 
         // --- БОНУСЫ ---
@@ -855,6 +850,8 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('free-cases');
             document.getElementById('inside-case-title').innerText = (type === 'sub') ? "За подписку" : "Бесплатный NFT";
             updateInsideCaseButton();
+            // Очищаем контейнер с лентами при входе
+            document.getElementById('roulette-rows-container').innerHTML = '';
         }
 
         function openPaidCase(type) {
@@ -863,6 +860,8 @@
             document.getElementById('btn-back-to-cases').onclick = () => switchScreen('paid-cases');
             document.getElementById('inside-case-title').innerText = (type === 'ring') ? "Кейс Ring" : "Multicast Case";
             updateInsideCaseButton();
+            // Очищаем контейнер с лентами при входе
+            document.getElementById('roulette-rows-container').innerHTML = '';
         }
 
         function updateInsideCaseButton() {
@@ -1035,17 +1034,19 @@
 
             currentWinItems = [];
             
-            document.getElementById('row-1').style.opacity = 1;
-            document.getElementById('row-1').style.pointerEvents = 'auto';
-            document.getElementById('row-2').style.opacity = 0;
-            document.getElementById('row-2').style.pointerEvents = 'none';
-            document.getElementById('row-3').style.opacity = 0;
-            document.getElementById('row-3').style.pointerEvents = 'none';
+            // Очищаем и создаем нужное количество лент
+            const rowsContainer = document.getElementById('roulette-rows-container');
+            rowsContainer.innerHTML = '';
             document.getElementById('multicast-text').style.display = 'none';
 
-            document.getElementById('track-1').innerHTML = '';
-            document.getElementById('track-2').innerHTML = '';
-            document.getElementById('track-3').innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                rowsContainer.innerHTML += `
+                    <div class="roulette-row" id="row-${i + 1}">
+                        <div class="live-line"></div>
+                        <div class="live-track" id="track-${i + 1}"></div>
+                    </div>
+                `;
+            }
 
             for (let i = 0; i < count; i++) {
                 currentWinItems.push(getRandomPrize());
@@ -1059,8 +1060,7 @@
 
                 let track = document.getElementById(`track-${index + 1}`);
                 let rowDiv = document.getElementById(`row-${index + 1}`);
-                rowDiv.style.opacity = 1;
-
+                
                 let source;
                 if (currentCaseType === 'sub') source = subCasePrizes;
                 else if (currentCaseType === 'ring') source = ringCasePrizes;
