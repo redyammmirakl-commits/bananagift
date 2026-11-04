@@ -114,16 +114,33 @@
         #screen-inside-case { background: var(--bg-main); position: relative; display: none; flex-direction: column; justify-content: space-between; }
         #screen-inside-case.active { display: flex; }
         
-        /* РУЛЕТКА */
-        .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 15px;}
+        /* СЛОТЫ (Мини-игра) */
+        #slots-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 150; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .slots-title { font-size: 28px; font-weight: 900; color: var(--purple); text-shadow: 0 0 15px var(--purple); margin-bottom: 30px; text-transform: uppercase;}
+        .slots-machine { display: flex; gap: 15px; margin-bottom: 30px; }
+        .slot-reel { 
+            width: 80px; height: 120px; background: var(--bg-card); border-radius: 15px; 
+            border: 3px solid #333; overflow: hidden; position: relative;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+        .slot-track { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; transition: transform 2s cubic-bezier(0.1, 0.7, 0.1, 1); }
+        .slot-item { width: 100%; height: 120px; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: 900; color: white; }
+        .slot-item.x2 { color: #4caf50; } .slot-item.x3 { color: #ffd700; } .slot-item.x5 { color: #ff4444; }
         
+        .slots-result-text { font-size: 24px; font-weight: bold; color: white; text-align: center; margin-bottom: 20px; display: none;}
+
+        /* РУЛЕТКА КЕЙСА */
+        .live-roulette-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; overflow: hidden; margin: 10px 0; gap: 15px;}
         .roulette-row { position: relative; width: 100%; height: 80px; overflow: hidden; display: flex; align-items: center; }
         .live-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--purple); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--purple); }
         .live-track { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); align-items: center; will-change: transform; }
         .live-item { width: 70px; height: 70px; margin: 0 5px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: var(--bg-card); border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .live-item img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
-        /* Эффект мультикаста */
         #multicast-text {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 60px; font-weight: 900; color: var(--purple);
@@ -242,7 +259,6 @@
         <div class="case-list">
             <h2 style="margin-top:0;">Кейсы</h2>
             
-            <!-- Кейс Ring (Старый) -->
             <div class="case-card glass-effect" onclick="openPaidCase('ring'); playClick()">
                 <div class="case-header">
                     <div class="case-icon" style="background:none; padding:0;"><img src="Без названия123_20261104170020.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
@@ -253,7 +269,6 @@
                 </div>
             </div>
 
-            <!-- НОВЫЙ КЕЙС Multicast -->
             <div class="case-card glass-effect" onclick="openPaidCase('multicast'); playClick()">
                 <div class="case-header">
                     <div class="case-icon" style="background:none; padding:0;"><img src="IMG_8170.jpeg" style="width:60px; height:60px; border-radius:15px;"></div>
@@ -345,10 +360,21 @@
         </div>
         
         <div class="live-roulette-area" id="roulette-container">
-            <!-- Текст мультикаста -->
+            <!-- ЭТО КОНТЕЙНЕР ДЛЯ СЛОТОВ (Мини-игра) -->
+            <div id="slots-container">
+                <div class="slots-title">MULTICAST</div>
+                <div class="slots-machine">
+                    <div class="slot-reel"><div class="slot-track" id="slot-track-1"></div></div>
+                    <div class="slot-reel"><div class="slot-track" id="slot-track-2"></div></div>
+                    <div class="slot-reel"><div class="slot-track" id="slot-track-3"></div></div>
+                </div>
+                <div class="slots-result-text" id="slots-result-text">Ожидание...</div>
+            </div>
+
+            <!-- Текст мультикаста (когда началась прокрутка кейсов) -->
             <div id="multicast-text">MULTICAST x2</div>
 
-            <!-- 3 ленты (для мультикаста) -->
+            <!-- Ленты кейса -->
             <div class="roulette-row" id="row-1">
                 <div class="live-line"></div>
                 <div class="live-track" id="track-1"></div>
@@ -527,32 +553,31 @@
             { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
         ];
 
-        // Призы для кейса Multicast (он же новый за 322)
+        // Призы для кейса Multicast (с большим шансом на звезды)
         const multicastPrizes = [
             { name: 'Signet Ring', img: 'Без названия116_20261104163406.png', chance: 0.1, price: 5300 },
             { name: 'Scared Cat', img: 'Без названия112_20261104035040.png', chance: 0.1, price: 5000 },
             { name: 'Valentine Box', img: 'Без названия117_20261104163651.png', chance: 1, price: 1000 },
-            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 1.5, price: 740 },
-            { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1.5, price: 740 },
-            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 2, price: 670 },
-            { name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', chance: 2, price: 670 },
-            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 3, price: 590 },
-            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 3, price: 590 },
-            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 3, price: 590 },
-            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 3, price: 590 },
-            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 4, price: 520 },
-            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 4, price: 520 },
-            { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 5, price: 440 },
-            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 10, price: 440 },
-            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 10, price: 370 },
-            { name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', chance: 10, price: 370 },
-            { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 25, isStar: true },
-            { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 15, isStar: true },
-            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 10, price: 10, isStar: true },
-            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 5, price: 5, isStar: true }
+            { name: 'Santa Hat', img: 'Без названия119_20261104164244.png', chance: 1, price: 740 },
+            { name: 'Bunny Muffin', img: 'Без названия118_20261104163915.png', chance: 1, price: 740 },
+            { name: 'Perfume Bottle', img: 'Без названия126_20261104175823.png', chance: 1.5, price: 670 },
+            { name: 'Mytch Mask', img: 'Без названия127_20261104180603.png', chance: 1.5, price: 670 },
+            { name: 'Loot Bag', img: 'Без названия125_20261104175552.png', chance: 2, price: 590 },
+            { name: 'Lunar Snake', img: 'Без названия128_20261104180906.png', chance: 2, price: 590 },
+            { name: 'Snoop Cigar', img: 'Без названия129_20261104181150.png', chance: 2, price: 590 },
+            { name: 'Evil Eye', img: 'Без названия130_20261104181340.png', chance: 2, price: 590 },
+            { name: 'Moon Pendant', img: 'Без названия124_20261104171135.png', chance: 3, price: 520 },
+            { name: 'Light Sword', img: 'Без названия122_20261104165019.png', chance: 3, price: 520 },
+            { name: 'Liberty Figure', img: 'Без названия123_20261104165318.png', chance: 4, price: 440 },
+            { name: 'Hypno Lollipop', img: 'Без названия113_20261104035101.png', chance: 8, price: 440 },
+            { name: 'Chill Flame', img: 'Без названия109_20261104034940.png', chance: 8, price: 370 },
+            { name: 'Fresh Sock', img: 'Без названия114_20261104035117.png', chance: 8, price: 370 },
+            // УВЕЛИЧЕННЫЕ ШАНСЫ НА ЗВЕЗДЫ
+            { name: '25 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 15, price: 25, isStar: true },
+            { name: '15 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 20, price: 15, isStar: true },
+            { name: '10 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 20, price: 10, isStar: true },
+            { name: '5 Stars', img: 'https://em-content.zobj.net/source/apple/354/star_2b50.png', chance: 19.8, price: 5, isStar: true }
         ];
-
-        const multicastChances = { x1: 75, x2: 15, x3: 9, x4: 0.9, x5: 0.1 };
 
         // --- БОНУСЫ ---
         function checkBonusSubscription() {
@@ -567,7 +592,6 @@
             }, 3000);
         }
 
-        // БЕСКОНЕЧНЫЙ ПРОМОКОД
         function activatePromo() {
             const code = document.getElementById('promo-input').value.trim().toUpperCase();
             if (code === 'WEXSIDE') {
@@ -804,6 +828,9 @@
             if(screenId === 'games' || screenId === 'inside-case' || screenId === 'upgrader' || screenId === 'paid-cases') document.querySelectorAll('.nav-item')[0].classList.add('active');
             if(screenId === 'bonuses') document.querySelectorAll('.nav-item')[2].classList.add('active');
             if(screenId === 'profile') document.querySelectorAll('.nav-item')[4].classList.add('active');
+            
+            // Скрываем слоты при переходе
+            document.getElementById('slots-container').style.display = 'none';
         }
 
         function openInsideCase(type) {
@@ -846,7 +873,7 @@
             if (isAnimating) { skipAllAnimations(); return; }
             
             if (currentCaseType === 'nft') {
-                if (hasNft) { showNftConditions(); } else { startMulticastSpin(true); } // true = без мультикаста
+                if (hasNft) { showNftConditions(); } else { startMulticastSpin(true); }
             } else if (currentCaseType === 'sub') {
                 if (starsClaimed) { tg.showAlert("Возвращайся позже!"); } else { checkSubscription(); }
             } else if (currentCaseType === 'ring') {
@@ -855,7 +882,7 @@
                 else {
                     if (donateBalance >= 149) donateBalance -= 149;
                     else { let rem = 149 - donateBalance; donateBalance = 0; bonusBalance -= rem; }
-                    updateUI(); startMulticastSpin(true); // true = без мультикаста
+                    updateUI(); startMulticastSpin(true); 
                 }
             } else if (currentCaseType === 'multicast') {
                 let balance = donateBalance + bonusBalance;
@@ -863,7 +890,7 @@
                 else {
                     if (donateBalance >= 322) donateBalance -= 322;
                     else { let rem = 322 - donateBalance; donateBalance = 0; bonusBalance -= rem; }
-                    updateUI(); startMulticastSpin(false); // false = с шансом на мультикаст
+                    updateUI(); startSlotsGame(); // Запускаем слоты!
                 }
             }
         }
@@ -885,7 +912,93 @@
             });
         }
 
-        // --- МЕХАНИКА МУЛЬТИКАСТА ---
+        // --- ИГРА В СЛОТЫ (Спец. механика для Multicast Case) ---
+        function startSlotsGame() {
+            if (isAnimating) return;
+            isAnimating = true;
+            updateInsideCaseButton();
+            playSpinSound();
+
+            const slotsContainer = document.getElementById('slots-container');
+            slotsContainer.style.display = 'flex';
+            
+            const resultText = document.getElementById('slots-result-text');
+            resultText.style.display = 'none';
+
+            // Возможные множители для слотов
+            const multipliers = ['1x', '2x', '2x', '3x', '3x', '5x']; // 2x и 3x падают чаще
+            
+            let finalMultipliers = [];
+            for (let i = 0; i < 3; i++) {
+                finalMultipliers.push(multipliers[Math.floor(Math.random() * multipliers.length)]);
+            }
+
+            // Запускаем анимацию слотов
+            for (let i = 1; i <= 3; i++) {
+                let track = document.getElementById(`slot-track-${i}`);
+                track.style.transition = 'none';
+                track.style.transform = 'translateY(0)';
+                track.innerHTML = '';
+                
+                // Генерируем 30 случайных элементов для прокрутки
+                for (let j = 0; j < 30; j++) {
+                    let randMult = multipliers[Math.floor(Math.random() * multipliers.length)];
+                    track.innerHTML += `<div class="slot-item ${randMult}">${randMult}</div>`;
+                }
+                // В 25-й позиции ставим финальный результат
+                track.innerHTML += `<div class="slot-item ${finalMultipliers[i-1]}">${finalMultipliers[i-1]}</div>`;
+            }
+
+            // Анимация остановки
+            setTimeout(() => {
+                let maxDelay = 0;
+                for (let i = 1; i <= 3; i++) {
+                    let track = document.getElementById(`slot-track-${i}`);
+                    let delay = i * 500; // Каждый следующий барабан останавливается позже
+                    if (delay > maxDelay) maxDelay = delay;
+                    
+                    setTimeout(() => {
+                        track.style.transition = 'transform 2s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                        // Смещаем так, чтобы 30-й элемент (последний) оказался в окне
+                        track.style.transform = `translateY(-${30 * 120}px)`; 
+                        playClick();
+                    }, delay);
+                }
+
+                setTimeout(() => {
+                    // Все барабаны остановились
+                    stopSpinSound();
+                    
+                    let m1 = finalMultipliers[0];
+                    let m2 = finalMultipliers[1];
+                    let m3 = finalMultipliers[2];
+                    
+                    let count = 1; // По умолчанию 1 кейс
+                    
+                    // ЛОГИКА: Если выпали одинаковые числа больше 1, получаем мультикейс
+                    if (m1 === m2 && m2 === m3 && m1 !== '1x') {
+                        count = parseInt(m1); // Если 2x 2x 2x -> 2 кейса
+                    } else {
+                        count = 1; // Если разные или 1x, то 1 кейс
+                    }
+
+                    resultText.innerText = count > 1 ? `ВЫПАЛО ${count} КЕЙСА!` : `ВЫПАЛ 1 КЕЙС`;
+                    resultText.style.color = count > 1 ? 'var(--gold)' : 'var(--text-main)';
+                    resultText.style.display = 'block';
+
+                    setTimeout(() => {
+                        slotsContainer.style.display = 'none';
+                        isAnimating = false; // Сбрасываем анимацию, чтобы начать крутить кейс
+                        startMulticastSpin(false, count); // Запускаем кейс нужное кол-во раз
+                    }, 2000);
+
+                }, maxDelay + 2100); // Ждем окончания анимации последнего барабана + 2 секунды
+
+            }, 100);
+        }
+
+
+        // --- МЕХАНИКА МУЛЬТИКАСТА (Прокрутка кейсов) ---
         function getRandomPrize() {
             let source;
             if (currentCaseType === 'sub') source = subCasePrizes;
@@ -905,25 +1018,13 @@
             return winItem;
         }
 
-        function getMulticastCount() {
-            const rand = Math.random() * 100;
-            if (rand < multicastChances.x5) return 5;
-            if (rand < multicastChances.x5 + multicastChances.x4) return 4;
-            if (rand < multicastChances.x5 + multicastChances.x4 + multicastChances.x3) return 3;
-            if (rand < multicastChances.x5 + multicastChances.x4 + multicastChances.x3 + multicastChances.x2) return 2;
-            return 1;
-        }
-
-        function startMulticastSpin(isNormalCase = false) {
+        function startMulticastSpin(isNormalCase = false, forcedCount = 1) {
             if (isAnimating) return;
             isAnimating = true;
             updateInsideCaseButton();
             playSpinSound();
 
-            let count = 1; 
-            if (!isNormalCase) {
-                count = getMulticastCount();
-            }
+            let count = forcedCount;
 
             currentWinItems = [];
             
